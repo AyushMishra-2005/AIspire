@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom'
+import Avatar from '@mui/material/Avatar';
 import {
   Navbar,
   NavBody,
@@ -34,6 +35,11 @@ export function NavbarDemo() {
               Login
             </NavbarButton>
             <NavbarButton variant="primary">Book a call</NavbarButton>
+            <Avatar
+              alt="Remy Sharp"
+              src="https://img.freepik.com/free-photo/lifestyle-people-emotions-casual-concept-confident-nice-smiling-asian-woman-cross-arms-chest-confident-ready-help-listening-coworkers-taking-part-conversation_1258-59335.jpg"
+              sx={{ width: 48, height: 48 }}
+            />
           </div>
         </NavBody>
 
@@ -41,10 +47,17 @@ export function NavbarDemo() {
         <MobileNav>
           <MobileNavHeader>
             <NavbarLogo />
-            <MobileNavToggle
+            <div className="flex gap-6 flex-row justify-center items-center mr-3">
+              <MobileNavToggle
               isOpen={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             />
+            <Avatar
+              alt="Remy Sharp"
+              src="https://img.freepik.com/free-photo/lifestyle-people-emotions-casual-concept-confident-nice-smiling-asian-woman-cross-arms-chest-confident-ready-help-listening-coworkers-taking-part-conversation_1258-59335.jpg"
+              sx={{ width: 48, height: 48 }}
+            />
+            </div>
           </MobileNavHeader>
 
           <MobileNavMenu

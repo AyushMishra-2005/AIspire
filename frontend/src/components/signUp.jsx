@@ -15,11 +15,14 @@ import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Link as RouterLink } from 'react-router-dom';
+import axios from 'axios'
+import server from '../environment.js'
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
+  const [profileFile, setProfileFile] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -55,6 +58,7 @@ function SignUp() {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setProfilePic(URL.createObjectURL(e.target.files[0]));
+      setProfileFile(e.target.files[0]);
     }
   };
 
@@ -81,9 +85,11 @@ function SignUp() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log('Form submitted', formData);
+    if(!validateForm()){
+      return;
     }
+    console.log('Form submitted', formData);
+    console.log(profileFile);
   };
 
   return (
