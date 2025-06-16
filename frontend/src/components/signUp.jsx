@@ -17,12 +17,19 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Link as RouterLink } from 'react-router-dom';
 import axios from 'axios'
 import server from '../environment.js'
+import { useAuth } from '../context/AuthProvider.jsx'
+import { toast } from 'react-hot-toast'
+
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
   const [profileFile, setProfileFile] = useState(null);
+  const { authUser, setAuthUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -62,12 +69,25 @@ function SignUp() {
     }
   };
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
     if (!formData.email) {
       setErrors(prev => ({ ...prev, email: true }));
       return;
     }
-    console.log('OTP sent to', formData.email);
+    try {
+      const { data } = await axios.post(
+        `${server}/user/sendOTP`,
+        { email: formData.email },
+        { withCredentials: true }
+      );
+
+      if (data) {
+        toast.success('OTP send Successfully');
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error('OTP send Failed!');
+    }
   };
 
   const validateForm = () => {
@@ -83,20 +103,127 @@ function SignUp() {
     return !Object.values(newErrors).some(error => error);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if(!validateForm()){
+  const handleVerifyOtp = async () => {
+    if (!formData.email) {
+      setErrors(prev => ({ ...prev, email: true }));
       return;
     }
-    console.log('Form submitted', formData);
-    console.log(profileFile);
+
+    if (!formData.otp) {
+      setErrors(prev => ({ ...prev, otp: true }));
+      return;
+    }
+
+    try {
+      const { data } = await axios.post(
+        `${server}/user/verifyOTP`,
+        {
+          email: formData.email,
+          otp: formData.otp
+        },
+        { withCredentials: true }
+      );
+
+      if (!data.valid) {
+        toast.error('Wrong OTP!');
+      }
+      return data.valid;
+    } catch (err) {
+      console.log(err);
+      toast.error('OTP Verify Failed!');
+    }
+
+  }
+
+  const handleSubmit = async (e) => {
+    setLoading(true);
+    e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
+
+    const valid = await handleVerifyOtp();
+
+    if (!valid) {
+      setLoading(false);
+      return;
+    }
+
+    let imageURL = "";
+
+    if (profileFile) {
+      try {
+        const { data } = await axios.get(
+          `${server}/getImage`,
+          {},
+          { withCredentials: true }
+        );
+
+        const imageFormData = new FormData();
+        imageFormData.append("file", profileFile);
+        imageFormData.append('api_key', data.apiKey);
+        imageFormData.append('timestamp', data.timestamp);
+        imageFormData.append('signature', data.signature);
+
+        const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${data.cloudName}/image/upload`;
+
+        const uploadRes = await axios.post(cloudinaryUrl, imageFormData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        imageURL = uploadRes.data.secure_url;
+
+        console.log(imageURL);
+
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    const userInfo = {
+      name: formData.name,
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+      confirmpassword: formData.confirmPassword,
+      profilePicURL: imageURL,
+      otp: formData.otp,
+    }
+
+    if (!imageURL || imageURL.trim() === "") {
+      const name = userInfo.name.trim();
+      const encodedName = encodeURIComponent(name);
+      imageURL = `https://ui-avatars.com/api/?name=${encodedName}&background=random&color=fff&size=128`;
+      userInfo.profilePicURL = imageURL;
+    }
+
+
+    await axios.post(
+      `${server}/user/signup`,
+      userInfo,
+      { withCredentials: true }
+    )
+      .then((response) => {
+        if (response.data) {
+          toast.success("SignUp successful you can login now.");
+        }
+        console.log(response.data);
+        localStorage.setItem("authUserData", JSON.stringify(response.data));
+        setAuthUser(response.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log("Error in signup page : ", err);
+        setLoading(false);
+      });
+
   };
 
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        width:'100vw',
+        width: '100vw',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -149,7 +276,7 @@ function SignUp() {
           <Typography variant="h5" component="h2" gutterBottom sx={{ color: 'white', mb: 3 }}>
             Profile Picture
           </Typography>
-          
+
           <Avatar
             src={profilePic}
             sx={{
@@ -164,7 +291,7 @@ function SignUp() {
           >
             {!profilePic && <PhotoCamera fontSize="large" />}
           </Avatar>
-          
+
           <label htmlFor="profile-pic">
             <input
               accept="image/*"
@@ -191,7 +318,7 @@ function SignUp() {
               Upload Profile
             </Button>
           </label>
-          
+
           <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', mt: 3, textAlign: 'center' }}>
             Upload a clear photo of yourself for better recognition
           </Typography>
@@ -418,8 +545,8 @@ function SignUp() {
             margin="normal"
             variant="outlined"
             error={errors.confirmPassword}
-            helperText={errors.confirmPassword ? 
-              (formData.password !== formData.confirmPassword ? 'Passwords do not match' : 'This field is required') 
+            helperText={errors.confirmPassword ?
+              (formData.password !== formData.confirmPassword ? 'Passwords do not match' : 'This field is required')
               : ''}
             InputLabelProps={{ style: { color: 'rgba(255, 255, 255, 0.7)' } }}
             InputProps={{
@@ -465,9 +592,15 @@ function SignUp() {
               '&:hover': {
                 backgroundColor: '#1565c0'
               },
+              '&.Mui-disabled': {
+                backgroundColor: '#90caf9', 
+                color: '#fff',              
+                boxShadow: 'none'          
+              },
               backdropFilter: 'blur(5px)',
               boxShadow: '0 4px 15px rgba(25, 118, 210, 0.3)'
             }}
+            disabled={loading}
           >
             Sign Up
           </Button>

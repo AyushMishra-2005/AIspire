@@ -5,6 +5,8 @@ import interviewSection from './route/interview.route.js'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import mongoose from 'mongoose'
+import { v2 as cloudinary } from 'cloudinary';
+import userRoute from './route/user.route.js'
 
 dotenv.config();
 const app = express();
@@ -21,6 +23,11 @@ app.use(cors({
 
 app.use(express.json({limit : "48kb"}));
 app.use(cookieParser());
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const main = async () => {
   await mongoose.connect(MONGO_URI).then((data) => {
@@ -32,24 +39,40 @@ const main = async () => {
 
 main();
 
+app.use('/user', userRoute);
 app.use('/interview', interviewSection);
 
-app.post("/sendUserMessage", async (req, res) => {
-  const { search } = req.body;
+// app.post("/sendUserMessage", async (req, res) => {
+//   const { search } = req.body;
 
-  const aiResponse = await axios.post(
-    "http://localhost:11434/api/generate",
-    {
-      "model": "llama3.2",
-      "prompt": `${search}`,
-      "stream": false
-    }
+//   const aiResponse = await axios.post(
+//     "http://localhost:11434/api/generate",
+//     {
+//       "model": "llama3.2",
+//       "prompt": `${search}`,
+//       "stream": false
+//     }
+//   );
+
+//   console.log(aiResponse.data.response);
+
+//   res.status(200).json({message : aiResponse.data.response});
+
+// });
+
+app.get("/getImage", (req, res) => {
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  const signature = cloudinary.utils.api_sign_request(
+    { timestamp },
+    process.env.CLOUDINARY_API_SECRET
   );
 
-  console.log(aiResponse.data.response);
-
-  res.status(200).json({message : aiResponse.data.response});
-
+  res.json({
+    timestamp,
+    signature,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME
+  });
 });
 
 

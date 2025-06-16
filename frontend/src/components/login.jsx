@@ -13,10 +13,15 @@ import GoogleIcon from '@mui/icons-material/Google';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Link as RouterLink } from 'react-router-dom';
+import axios from 'axios'
+import server from '../environment.js'
+import { useAuth } from '../context/AuthProvider.jsx'
+import { LoaderIcon, toast } from 'react-hot-toast'
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { setAuthUser } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     otp: '',
@@ -45,13 +50,61 @@ function Login() {
     }
   };
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
     if (!formData.email) {
       setErrors(prev => ({ ...prev, email: true }));
       return;
     }
     console.log('OTP sent to', formData.email);
+
+    try {
+      const { data } = await axios.post(
+        `${server}/user/sendOTP`,
+        { email : formData.email },
+        { withCredentials: true }
+      );
+
+      if(data){
+        toast.success('OTP send Successfully');
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error('OTP send Failed!');
+    }
+
   };
+
+  const handleVerifyOtp = async () => {
+    if (!formData.email) {
+      setErrors(prev => ({ ...prev, email: true }));
+      return;
+    }
+
+    if(!formData.otp){
+      setErrors(prev => ({ ...prev, otp: true }));
+      return;
+    }
+
+    try {
+      const { data } = await axios.post(
+        `${server}/user/verifyOTP`,
+        { 
+          email : formData.email,
+          otp : formData.otp
+        },
+        { withCredentials: true }
+      );
+
+      if(!data.valid){
+        toast.error('Wrong OTP!');
+      }
+      return data.valid;
+    } catch (err) {
+      console.log(err);
+      toast.error('OTP Verify Failed!');
+    }
+    
+  }
 
   const validateForm = () => {
     const newErrors = {
@@ -64,18 +117,52 @@ function Login() {
     return !Object.values(newErrors).some(error => error);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log('Form submitted', formData);
+    if (!validateForm()) {
+      return;
     }
+
+    const valid = await handleVerifyOtp();
+
+    if(!valid){
+      return;
+    }
+
+    const userInfo = {
+      email: formData.email,
+      password: formData.password,
+      confirmpassword: formData.confirmPassword,
+      otp: formData.otp,
+    }
+
+    console.log(userInfo);
+
+    await axios.post(`${server}/user/login`, userInfo, {
+      withCredentials: true,
+    })
+      .then((response) => {
+        if (response.data) {
+          toast.success("User Logged In Successful!");
+        } else {
+          toast.error("User Logged In fail!");
+          return;
+        }
+
+        localStorage.setItem("authUserData", JSON.stringify(response.data));
+        setAuthUser(response.data);
+      })
+      .catch((err) => {
+        console.log("Error in login : ", err);
+      });
+
   };
 
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        width:'100vw',
+        width: '100vw',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -91,7 +178,7 @@ function Login() {
           borderRadius: 4,
           width: '500px',
           height: 'auto',
-          
+
           boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.5)',
           display: 'flex',
           flexDirection: 'column',
@@ -136,38 +223,55 @@ function Login() {
           <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'white', textAlign: 'center', mb: 3 }}>
             Login
           </Typography>
-
-          <TextField
-            fullWidth
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            margin="normal"
-            variant="outlined"
-            error={errors.email}
-            helperText={errors.email ? 'This field is required' : ''}
-            InputLabelProps={{ style: { color: 'rgba(255, 255, 255, 0.7)' } }}
-            InputProps={{
-              style: { color: 'white' },
-              sx: {
-                '& fieldset': {
-                  borderColor: 'rgba(255, 255, 255, 0.1)',
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1, mb: 2 }}>
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              margin="normal"
+              variant="outlined"
+              error={errors.email}
+              helperText={errors.email ? 'This field is required' : ''}
+              InputLabelProps={{ style: { color: 'rgba(255, 255, 255, 0.7)' } }}
+              InputProps={{
+                style: { color: 'white' },
+                sx: {
+                  '& fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#90caf9',
+                  },
+                }
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backdropFilter: 'blur(5px)',
+                  background: 'rgba(30, 30, 30, 0.2)'
                 },
-                '&:hover fieldset': {
-                  borderColor: '#90caf9',
+                mb: 2
+              }}
+            />
+            <Button
+              variant="contained"
+              onClick={handleSendOtp}
+              sx={{
+                height: '56px',
+                backgroundColor: '#1976d2',
+                '&:hover': {
+                  backgroundColor: '#1565c0'
                 },
-              }
-            }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
                 backdropFilter: 'blur(5px)',
-                background: 'rgba(30, 30, 30, 0.2)'
-              },
-              mb: 2
-            }}
-          />
+                boxShadow: '0 2px 10px rgba(25, 118, 210, 0.3)',
+                minWidth: '120px'
+              }}
+            >
+              Send OTP
+            </Button>
+          </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1, mb: 2 }}>
             <TextField
@@ -199,22 +303,6 @@ function Login() {
                 }
               }}
             />
-            <Button
-              variant="contained"
-              onClick={handleSendOtp}
-              sx={{
-                height: '56px',
-                backgroundColor: '#1976d2',
-                '&:hover': {
-                  backgroundColor: '#1565c0'
-                },
-                backdropFilter: 'blur(5px)',
-                boxShadow: '0 2px 10px rgba(25, 118, 210, 0.3)',
-                minWidth: '120px'
-              }}
-            >
-              Send OTP
-            </Button>
           </Box>
 
           <TextField
@@ -270,8 +358,8 @@ function Login() {
             margin="normal"
             variant="outlined"
             error={errors.confirmPassword}
-            helperText={errors.confirmPassword ? 
-              (formData.password !== formData.confirmPassword ? 'Passwords do not match' : 'This field is required') 
+            helperText={errors.confirmPassword ?
+              (formData.password !== formData.confirmPassword ? 'Passwords do not match' : 'This field is required')
               : ''}
             InputLabelProps={{ style: { color: 'rgba(255, 255, 255, 0.7)' } }}
             InputProps={{

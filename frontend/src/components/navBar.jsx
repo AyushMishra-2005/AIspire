@@ -12,10 +12,13 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "../components/ui/resizable-navbar.jsx";
+import { useAuth } from "../context/AuthProvider.jsx";
+import { toast } from "react-hot-toast";
 
 export function NavbarDemo() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { authUser } = useAuth();
 
   const navItems = [
     { name: "Home", link: "/" },
@@ -31,15 +34,21 @@ export function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            <NavbarButton variant="secondary" onClick={() => navigate("/login")}>
-              Login
-            </NavbarButton>
+            {
+              authUser ? <NavbarButton variant="secondary" onClick={() => navigate("/logout")}>
+                Logout
+              </NavbarButton> : <NavbarButton variant="secondary" onClick={() => navigate("/login")}>
+                Login
+              </NavbarButton>
+            }
             <NavbarButton variant="primary">Book a call</NavbarButton>
-            <Avatar
-              alt="Remy Sharp"
-              src="https://img.freepik.com/free-photo/lifestyle-people-emotions-casual-concept-confident-nice-smiling-asian-woman-cross-arms-chest-confident-ready-help-listening-coworkers-taking-part-conversation_1258-59335.jpg"
-              sx={{ width: 48, height: 48 }}
-            />
+            {
+              authUser && <Avatar
+                alt="Remy Sharp"
+                src={authUser.user.profilePicURL}
+                sx={{ width: 48, height: 48 }}
+              />
+            }
           </div>
         </NavBody>
 
@@ -49,14 +58,16 @@ export function NavbarDemo() {
             <NavbarLogo />
             <div className="flex gap-6 flex-row justify-center items-center mr-3">
               <MobileNavToggle
-              isOpen={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            />
-            <Avatar
-              alt="Remy Sharp"
-              src="https://img.freepik.com/free-photo/lifestyle-people-emotions-casual-concept-confident-nice-smiling-asian-woman-cross-arms-chest-confident-ready-help-listening-coworkers-taking-part-conversation_1258-59335.jpg"
-              sx={{ width: 48, height: 48 }}
-            />
+                isOpen={isMobileMenuOpen}
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              />
+              {
+                authUser && <Avatar
+                  alt="Remy Sharp"
+                  src={authUser.user.profilePicURL}
+                  sx={{ width: 48, height: 48 }}
+                />
+              }
             </div>
           </MobileNavHeader>
 
@@ -75,16 +86,28 @@ export function NavbarDemo() {
               </a>
             ))}
             <div className="flex w-full flex-col gap-4">
-              <NavbarButton
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  navigate('/login');
-                }}
-                variant="primary"
-                className="w-full"
-              >
-                Login
-              </NavbarButton>
+              {
+                authUser ? <NavbarButton
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate('/logout');
+                  }}
+                  variant="primary"
+                  className="w-full"
+                >
+                  Logout
+                </NavbarButton> : <NavbarButton
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate('/login');
+                  }}
+                  variant="primary"
+                  className="w-full"
+                >
+                  Login
+                </NavbarButton>
+              }
+
               <NavbarButton
                 onClick={() => setIsMobileMenuOpen(false)}
                 variant="primary"

@@ -7,7 +7,6 @@ import useConversation from "../stateManage/useConversation.js";
 import axios from "axios";
 import TextToVoice from "../components/textToVoice.jsx";
 
-
 function InterviewPage() {
   const [spokenText, setSpokenText] = useState("");
   const [recordingStatus, setRecordingStatus] = useState(true);

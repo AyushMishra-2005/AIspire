@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken'
-import User from '../models/user.model'
+import User from '../models/user.model.js'
 import dotenv from 'dotenv'
 
 dotenv.config();
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-const secureRoute = async (req, res) => {
+const secureRoute = async (req, res, next) => {
   try{
     const token = req.cookies.token;
 
