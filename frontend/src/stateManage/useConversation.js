@@ -12,6 +12,16 @@ const useConversation = create((set) => ({
 
   givenAnswers: [],
   setGivenAnswers: (givenAnswers) => set({givenAnswers}),
+
+  accessInterviewPage: false,
+  setAccessInterviewPage: (accessInterviewPage) => set({accessInterviewPage}), 
+
+  interviewData: {
+    topic: "",
+    role: "",
+    numOfQns: 0,
+  },
+  setInterviewData: (interviewData) => set({ interviewData }),
 }));
 
 export default useConversation;

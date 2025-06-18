@@ -2,10 +2,12 @@ import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import { CardBody, CardContainer, CardItem } from "../components/ui/3d-card.jsx";
 import useConversation from '../stateManage/useConversation.js';
+import {useAuth} from '../context/AuthProvider.jsx'
 
 function CandidateSection() {
   const { candidateAnswer } = useConversation();
   const [isSpeaking, setIsSpeaking] = React.useState(false);
+  const {authUser} = useAuth();
 
   React.useEffect(() => {
     if (candidateAnswer.trim()) {
@@ -22,7 +24,7 @@ function CandidateSection() {
           <CardItem translateZ="100" className="w-full h-full flex justify-center items-center">
             <Avatar
               alt="Candidate"
-              src="https://img.freepik.com/free-photo/lifestyle-people-emotions-casual-concept-confident-nice-smiling-asian-woman-cross-arms-chest-confident-ready-help-listening-coworkers-taking-part-conversation_1258-59335.jpg"
+              src={authUser?.user.profilePicURL}
               sx={{
                 width: 156,
                 height: 156,
@@ -40,7 +42,7 @@ function CandidateSection() {
           translateZ="50"
           className="text-xl font-bold text-neutral-600 dark:text-white"
         >
-          Ishika Didi
+          {authUser.user.name}
         </CardItem>
       </CardBody>
     </CardContainer>

@@ -1,7 +1,9 @@
 import axios from 'axios';
+import InterviewData from '../models/interview.model.js';
 
 export const generateQuestions = async (req, res) => {
-  const { role, topic, name, previousQuestions = [], askedQuestion, givenAnswer } = req.body;
+  const { role, topic, name, previousQuestions = [], askedQuestion, givenAnswer, numOfQns } = req.body;
+  const { email } = req.user;
 
   if (!role || !topic || !name) {
     return res.status(500).json({ message: "Must provide a role, topic, and name!" });
@@ -21,24 +23,29 @@ export const generateQuestions = async (req, res) => {
     let response;
 
     if (previousQuestions.length === 0) {
-      console.log("I am working");
-      const prompt = `You are an AI interviewer conducting a mock interview for the role of ${role}, focusing on the topic: ${topic}.
-      Start by welcoming the candidate named ${name} in a natural, professional tone using only two sentences and under 100 words.
-      Do not mention that this is a simulation, mock interview, or that you're an AI. Refer to the job role like a real position (e.g., "frontend developer" not "role of frontend developer").
+      const prompt = `You are conducting a professional interview for a ${role} position focusing on ${topic}.
 
-      Then, write the first interview question related to "${topic}" that can be answered in a maximum of 8 lines.
-      Before the question, add a short transition phrase like "Moving on to the first question," "Let's begin with the first question," or "To start off,".
-      Keep the question clear, concise, and focused.
+        Generate:
 
-      Return your output in this exact JSON format:
-      {
-        "transition": "your welcome message here",
-        "question": "your transition phrase and first interview question here"
-      }
-      Important: Return only the JSON object and nothing else. 
-      Do not include any explanations, extra text, or commentary before or after the JSON. 
-      Your entire response must be valid JSON that can be parsed directly with JSON.parse().  
-      `;
+        1. A brief, professional welcome message for ${name} in a natural tone.
+          - It must be exactly 2 sentences and under 100 words total.
+          - Do NOT mention simulations, mock interviews, AI, or automation.
+          - Refer to the job title naturally and directly (e.g., "frontend developer" instead of "this position" or "the role").
+
+        2. A creative, general transition message that:
+          - Acts as a smooth lead-in to the first question (e.g., "To start off,", "Let’s get started with,", "Kicking things off,").
+          - Must be a standalone phrase or sentence starter (not a full sentence or question).
+          - Must NOT include any part of a question, topic, hint, or reference to the candidate’s background, experience, or skills.
+          - Must NOT contain a question mark.
+          - Must be professional, slightly varied, and conversational (avoid overused phrases like "Moving on").
+
+        Return STRICT JSON only in this format:
+        {
+          "addressing": "welcome message",
+          "transition": "transition message"
+        }`;
+
+
 
       aiResponse = await axios.post(
         "http://localhost:11434/api/generate",
@@ -46,51 +53,100 @@ export const generateQuestions = async (req, res) => {
           model: "llama3.2",
           prompt: prompt,
           stream: false,
+          format: "json",
+          options: {
+            temperature: 0.7
+          }
         }
       );
 
       const rawdata = aiResponse.data.response;
+
       const jsonMatch = rawdata.match(/\{(?:[^{}]|(?:\{[^{}]*\}))*\}/);
       if (!jsonMatch) {
         return res.status(500).json({ message: "Invalid JSON received from AI!" });
       }
       response = JSON.parse(jsonMatch[0]);
 
-      const { question, transition } = response;
+      const { addressing, transition } = response;
 
-      if (!question || !transition) {
+      if (!addressing || !transition) {
         return res.status(500).json({ message: "Failed to generate question!" });
       }
 
-      let responseData = transition + " " + question;
-      console.log(question);
+      const data = await InterviewData.findOne({ email });
+      const question = data.questions[0];
+
+      let transitionData = transition.trim();
+      if (transitionData.endsWith(".")) {
+        transitionData = transitionData.slice(0, -1) + ",";
+      } else if (!transitionData.endsWith(",")) {
+        transitionData += ",";
+      }
+
+      let responseData = addressing + " " + transitionData + " " + question;
+
       return res.status(200).json({ message: "Question generated!", question, responseData });
 
     } else {
-      prompt = `You are an AI interviewer conducting a mock interview for the role of ${role}, focusing on the topic: ${topic}.
-      You asked the question: "${askedQuestion}", and the candidate responded: "${givenAnswer}".
 
-      First, provide feedback on the candidate's answer. Speak directly to the candidate using "you" or "your". Give exactly two natural, professional feedback sentences. Do not ask follow-up questions, give suggestions, include ratings, or extra commentary. Stop after two sentences. Keep the feedback under 100 words.
+      if (previousQuestions.length == numOfQns) {
 
-      Then, choose one transition phrase from the following list to begin your next question:
-      ["Now, let's move on to the next question.", "Let's continue with the next question.", "Moving forward, here's another question.", "Next, consider this:", "Here comes the next one."]
+        prompt = `You are conducting a professional interview for ${role} focusing on ${topic}.
 
-      After the transition phrase, ask one new question related to "${topic}" that is COMPLETELY DIFFERENT from these already asked questions:
-      ${previousQuestions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}
+        Previous Question: "${askedQuestion}"
+        Candidate Answer: "${givenAnswer}"
 
-      IMPORTANT:
-      - The new question must be substantially different in content and scope
-      - Do not rephrase or slightly modify previous questions
-      - Cover a different aspect of ${topic}
-      - The question should be clear, concise, and answerable in 8 lines or less
-      - Do not ask questions during giving review. Only give review about the user answer.
+        Generate:
 
-      Return your output in this exact JSON format:
-      {
-        "feedback": "your two-sentence feedback here",
-        "question": "your transition phrase and next question here"
+        1. FEEDBACK (STRICT RULES):
+          - Exactly 2 professional sentences
+          - Use "you/your" to address the candidate directly
+          - Only assess the answer — no suggestions, tips, or ratings
+          - Example: "Your explanation covered X well. You might clarify Y."
+
+        2. END MESSAGE (STRICT RULES):
+          - Generate a professional, warm, and slightly longer thank-you message (2–3 sentences)
+          - Express appreciation for the candidate’s time, effort, and responses
+          - Example tone: "Thank you for participating in this interview. Your insights were valuable and demonstrated thoughtful engagement. We appreciate the time and effort you invested."
+
+        Return STRICT JSON:
+        {
+          "feedback": "your 2-sentence feedback",
+          "transition": "a 2–3 sentence thank-you message to end the interview"
+        }
+        ONLY return this JSON with no other text.`;
+
+      } else {
+
+        prompt = `You are conducting a professional interview for ${role} focusing on ${topic}.
+
+        Previous Question: "${askedQuestion}"
+        Candidate Answer: "${givenAnswer}"
+
+        Generate:
+
+        1. FEEDBACK (STRICT RULES):
+          - Exactly 2 professional sentences
+          - Use "you/your" to address the candidate directly
+          - Only assess the answer — no suggestions, tips, or ratings
+          - Example: "Your explanation covered X well. You might clarify Y."
+
+        2. TRANSITION (STRICT RULES):
+          - Use one of these openings:
+            "Next, let's discuss,", "Moving on to,", "Now, consider,"
+          - Do NOT include a question — just a natural lead-in to a new topic
+          - End with a colon or ellipsis, not a full sentence or question
+
+        Return STRICT JSON:
+        {
+          "feedback": "your 2-sentence feedback",
+          "transition": "transition phrase only (no question)"
+        }
+        ONLY return this JSON with no other text.`;
       }
-      Important: Return only the JSON object and nothing else.`;
+
+
 
       aiResponse = await axios.post(
         "http://localhost:11434/api/generate",
@@ -98,6 +154,10 @@ export const generateQuestions = async (req, res) => {
           model: "llama3.2",
           prompt: prompt,
           stream: false,
+          format: "json",
+          options: {
+            temperature: 0.7
+          }
         }
       );
 
@@ -112,13 +172,35 @@ export const generateQuestions = async (req, res) => {
         return res.status(500).json({ message: "Invalid JSON received from AI!" });
       }
       response = JSON.parse(jsonMatch[0]);
+      const { feedback, transition } = response;
+
+      const data = await InterviewData.findOne({ email });
+      const question = data.questions[previousQuestions.length];
+
+      let transitionData = transition.trim();
 
 
-      const { feedback, question } = response;
+      if (!question) {
+        if (transitionData.endsWith(",")) {
+          transitionData = transitionData.slice(0, -1) + ".";
+        } else if (!transitionData.endsWith(".")) {
+          transitionData += ".";
+        }
+      } else {
+        if (transitionData.endsWith(".")) {
+          transitionData = transitionData.slice(0, -1) + ",";
+        } else if (!transitionData.endsWith(",")) {
+          transitionData += ",";
+        }
+      }
 
-      let responseData = feedback + " " + question;
+      let responseData = "";
 
-      console.log(question);
+      if (!question) {
+        responseData = feedback + " " + transitionData;
+      } else {
+        responseData = feedback + " " + transitionData + " " + question;
+      }
 
       return res.status(200).json({ message: "Question generated!", question, responseData });
     }
@@ -132,7 +214,111 @@ export const generateQuestions = async (req, res) => {
 
 
 
+export const checkRoleAndTopic = async (req, res) => {
 
+  const { role, topic, numOfQns } = req.body;
+  const email = req.user.email;
+
+  if (!role || !topic || !numOfQns) {
+    return res.status(500).json({ message: "Provide valid inputs" });
+  }
+
+  if (numOfQns < 2 || numOfQns > 25) {
+    return res.status(400).json({ message: "Please provide a number of questions between 1 and 25." });
+  }
+
+  try {
+    const prompt = `
+    You are an expert AI interview assistant.
+
+    Your task:
+    - Validate whether the given role and topic are appropriate and related.
+    - If valid, generate an array of unique interview questions relevant to the role and topic.
+
+    Constraints:
+    1. Generate exactly ${numOfQns} unique and non-repetitive interview questions.
+    2. Each question must be answerable within 6 lines and should not exceed 600 words in response.
+    3. All questions must be different from each other in wording and focus.
+    4. Return your response strictly in the following JSON format:
+
+    If valid:
+    {
+      "valid": true,
+      "questions": [
+        "First unique question?",
+        "Second unique question?",
+        ...
+      ]
+    }
+
+    If invalid (role and topic do not match or are inappropriate):
+    {
+      "valid": false,
+      "questions": []
+    }
+
+    Now process this input:
+    Role: ${role}
+    Topic: ${topic}
+
+    Only respond with the JSON object as described above. Do not include any explanations.`;
+
+    const aiResponse = await axios.post(
+      "http://localhost:11434/api/generate",
+      {
+        model: "llama3.2",
+        prompt: prompt,
+        stream: false,
+        format: "json",
+        options: {
+          temperature: 0.7
+        }
+      }
+    );
+
+    let rawdata = aiResponse.data.response;
+
+    if (!rawdata.endsWith("}")) {
+      rawdata += "}";
+    }
+
+    const jsonMatch = rawdata.match(/\{(?:[^{}]|(?:\{[^{}]*\}))*\}/);
+    if (!jsonMatch) {
+      return res.status(500).json({ message: "Invalid JSON received from AI!" });
+    }
+    const response = JSON.parse(jsonMatch[0]);
+
+    let { valid, questions } = response;
+
+
+    if (valid) {
+      try {
+
+        questions = questions.slice(0, numOfQns);
+
+        await InterviewData.findOneAndDelete({ email });
+
+        const newData = new InterviewData({
+          email,
+          questions
+        });
+
+        await newData.save();
+
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+
+    return res.status(200).json({ message: "Questions generated", response });
+
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+}
 
 
 

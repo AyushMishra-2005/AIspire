@@ -22,7 +22,7 @@ export function NavbarDemo() {
 
   const navItems = [
     { name: "Home", link: "/" },
-    { name: "Interview", link: "/InterviewPage" },
+    { name: "Interview", link: "/interviewForm" },
     { name: "Contact", link: "#contact" },
   ];
 

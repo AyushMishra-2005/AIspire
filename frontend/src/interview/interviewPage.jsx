@@ -6,6 +6,9 @@ import VoiceConvertor from "../components/voiceToText.jsx";
 import useConversation from "../stateManage/useConversation.js";
 import axios from "axios";
 import TextToVoice from "../components/textToVoice.jsx";
+import { useAuth } from "../context/AuthProvider.jsx";
+import server from '../environment.js'
+import {useNavigate} from 'react-router-dom'
 
 function InterviewPage() {
   const [spokenText, setSpokenText] = useState("");
@@ -13,6 +16,9 @@ function InterviewPage() {
   const [transcript, setTranscript] = useState("");
   const [controls, setControls] = useState(null);
   const scrollRef = useRef(null);
+  const {authUser} = useAuth();
+  const navigate = useNavigate();
+
   const {
     candidateAnswer,
     setCandidateAnswer,
@@ -21,7 +27,8 @@ function InterviewPage() {
     askedQuestions,
     setAskedQuestions,
     givenAnswers,
-    setGivenAnswers
+    setGivenAnswers,
+    interviewData
   } = useConversation();
   const [startInterview, setStartInterview] = useState(false);
 
@@ -48,21 +55,24 @@ function InterviewPage() {
     controls?.resetTranscript();
 
     try {
-      const role = "user";
-      const topic = "Fullstack Web Development";
-      const name = "Ishika"
+      const role = interviewData?.role;
+      const topic = interviewData?.topic;
+      const numOfQns = interviewData?.numOfQns;
+      const name = authUser.user.name;
       const previousQuestions = askedQuestions;
       const askedQuestion = assistantContent;
       const givenAnswer = candidateAnswer;
       console.log(previousQuestions);
 
-      const {data} = await axios.post("http://localhost:8000/interview/generate-question",
-        { role, topic, name, previousQuestions, askedQuestion, givenAnswer }
+      const {data} = await axios.post(`${server}/interview/generate-question`,
+        { role, topic, name, previousQuestions, askedQuestion, givenAnswer, numOfQns },
+        {withCredentials : true}
       );
 
       setAssistantContent(data.responseData);
       askedQuestions.push(data.question);
       setAskedQuestions(askedQuestions);
+
     } catch (err) {
       console.log(err);
     }
@@ -73,14 +83,16 @@ function InterviewPage() {
   const handleStartInterview = async () => {
     setStartInterview(true);
     try {
-      const role = "user";
-      const topic = "Fullstack Web Development";
-      const name = "Ishika"
+      const role = interviewData?.role;
+      const topic = interviewData?.topic;
+      const numOfQns = interviewData?.numOfQns;
+      const name = authUser.user.name;
       const previousQuestions = askedQuestions;
       console.log(previousQuestions);
   
-      const { data } = await axios.post("http://localhost:8000/interview/generate-question",
-        { role, topic, name, previousQuestions}
+      const { data } = await axios.post(`${server}/interview/generate-question`,
+        { role, topic, name, previousQuestions, numOfQns},
+        {withCredentials : true}
       );
       setAssistantContent(data.responseData);
       askedQuestions.push(data.question);
@@ -94,6 +106,7 @@ function InterviewPage() {
     setStartInterview(false);
     setAskedQuestions([]);
     setAssistantContent("");
+    navigate("/");
   }
 
   return (

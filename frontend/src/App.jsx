@@ -9,11 +9,13 @@ import { Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './context/AuthProvider';
 import Logout from './components/logout';
+import InterviewForm from './interview/interviewForm';
+import useConversation from './stateManage/useConversation';
 
 function App() {
 
   const {authUser} = useAuth();
-  console.log(authUser);
+  const {accessInterviewPage} = useConversation();
 
   return (
     <>
@@ -34,7 +36,7 @@ function App() {
         <div className='flex flex-col items-center h-[100%] w-[100vw] bg-black'>
           <Routes>
             <Route path='/' element={<HomeComponent />} />
-            <Route path='/interviewPage' element={authUser ? <InterviewPage /> : <Login />} />
+            <Route path='/interviewPage' element={authUser && accessInterviewPage ? <InterviewPage /> : <HomeComponent />} />
             <Route path='/signup' element={authUser ? <HomeComponent />  : <SignupForm />} />
             <Route path='/login' element={authUser ? <HomeComponent /> : <Login />} />
             <Route path="*" element={
@@ -45,6 +47,7 @@ function App() {
               </>
             } />
             <Route path='/logout' element={authUser? <Logout/> : <HomeComponent />}/>
+            <Route path='/interviewForm' element={authUser? <InterviewForm/> : <Login />}/>
           </Routes>
         </div>
 
