@@ -8,15 +8,19 @@ import axios from "axios";
 import TextToVoice from "../components/textToVoice.jsx";
 import { useAuth } from "../context/AuthProvider.jsx";
 import server from '../environment.js'
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 function InterviewPage() {
   const [spokenText, setSpokenText] = useState("");
   const [recordingStatus, setRecordingStatus] = useState(true);
   const [transcript, setTranscript] = useState("");
   const [controls, setControls] = useState(null);
+  const [userMic, setUserMic] = useState(false);
+  const [aiSpeaking, setAiSpeaking] = useState(false);
+  const [finishInterview, setFinishInterview] = useState(false);
+
   const scrollRef = useRef(null);
-  const {authUser} = useAuth();
+  const { authUser } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -48,11 +52,18 @@ function InterviewPage() {
     controls?.startListening();
   }
 
+  useEffect(() => {
+    if(!aiSpeaking && finishInterview){
+      navigate('/');
+    }
+  }, [aiSpeaking, finishInterview]);
+
   const handleSendRecording = async () => {
     setSpokenText("");
     setRecordingStatus(true);
     controls?.stopListening();
     controls?.resetTranscript();
+    setAiSpeaking(true);
 
     try {
       const role = interviewData?.role;
@@ -64,14 +75,20 @@ function InterviewPage() {
       const givenAnswer = candidateAnswer;
       console.log(previousQuestions);
 
-      const {data} = await axios.post(`${server}/interview/generate-question`,
+      const { data } = await axios.post(`${server}/interview/generate-question`,
         { role, topic, name, previousQuestions, askedQuestion, givenAnswer, numOfQns },
-        {withCredentials : true}
+        { withCredentials: true }
       );
 
       setAssistantContent(data.responseData);
       askedQuestions.push(data.question);
       setAskedQuestions(askedQuestions);
+
+      if(data.finishInterview){
+        setFinishInterview(data.finishInterview);
+        setAiSpeaking(true);
+      }
+
 
     } catch (err) {
       console.log(err);
@@ -82,6 +99,8 @@ function InterviewPage() {
 
   const handleStartInterview = async () => {
     setStartInterview(true);
+    setUserMic(true);
+    setAiSpeaking(true);
     try {
       const role = interviewData?.role;
       const topic = interviewData?.topic;
@@ -89,10 +108,10 @@ function InterviewPage() {
       const name = authUser.user.name;
       const previousQuestions = askedQuestions;
       console.log(previousQuestions);
-  
+
       const { data } = await axios.post(`${server}/interview/generate-question`,
-        { role, topic, name, previousQuestions, numOfQns},
-        {withCredentials : true}
+        { role, topic, name, previousQuestions, numOfQns },
+        { withCredentials: true }
       );
       setAssistantContent(data.responseData);
       askedQuestions.push(data.question);
@@ -125,7 +144,10 @@ function InterviewPage() {
         <div className="h-[80%] w-[100%] flex flex-row justify-evenly">
           <AssistantPage />
           <CandidateSection />
-          <TextToVoice />
+          <TextToVoice
+            onStart={() => setAiSpeaking(true)}
+            onEnd={() => setAiSpeaking(false)}
+          />
         </div>
 
         <div className="w-[80%] mb-8 flex flex-col items-center space-y-4">
@@ -149,27 +171,33 @@ function InterviewPage() {
 
           <div className="flex space-x-4">
             {
-              recordingStatus ? <button
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
-                onClick={() => {
-                  handleBeginRecordingButton();
-                }}
-                disabled={
-                  controls?.isListening
-                }
-              >
-                Begin Recording
-              </button> : <button
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
-                onClick={() => {
-                  handleSendRecording();
-                }}
-                disabled={
-                  !controls?.isListening
-                }
-              >
-                Send Recording
-              </button>
+              recordingStatus ? (
+                <button
+                  className={cn(
+                    "px-6 py-3 font-medium rounded-lg transition-all duration-200 shadow-md transform hover:-translate-y-0.5 focus:outline-none",
+                    "bg-gradient-to-r from-blue-600 to-blue-500 text-white",
+                    "hover:from-blue-700 hover:to-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50",
+                    (!userMic || controls?.isListening || aiSpeaking) && "opacity-50 cursor-not-allowed hover:from-blue-600 hover:to-blue-500"
+                  )}
+                  onClick={handleBeginRecordingButton}
+                  disabled={!userMic || controls?.isListening || aiSpeaking}
+                >
+                  Begin Recording
+                </button>
+              ) : (
+                <button
+                  className={cn(
+                    "px-6 py-3 font-medium rounded-lg transition-all duration-200 shadow-md transform hover:-translate-y-0.5 focus:outline-none",
+                    "bg-gradient-to-r from-blue-600 to-blue-500 text-white",
+                    "hover:from-blue-700 hover:to-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50",
+                    (!userMic || !controls?.isListening || aiSpeaking) && "opacity-50 cursor-not-allowed hover:from-blue-600 hover:to-blue-500"
+                  )}
+                  onClick={handleSendRecording}
+                  disabled={!userMic || !controls?.isListening || aiSpeaking}
+                >
+                  Send Recording
+                </button>
+              )
             }
 
             {

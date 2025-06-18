@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useConversation from "../stateManage/useConversation";
 
-function TextToVoice() {
+function TextToVoice({onStart, onEnd}) {
   const [selectedVoice, setSelectedVoice] = useState(null);
   const { assistantContent, setAssistantContent } = useConversation();
 
@@ -20,6 +20,16 @@ function TextToVoice() {
       window.speechSynthesis.onvoiceschanged = loadVoices;
       loadVoices();
     }
+
+    const stopSpeech = () => {
+      window.speechSynthesis.cancel();
+    };
+
+    window.addEventListener("beforeunload", stopSpeech);
+    return () => {
+      stopSpeech();
+      window.removeEventListener("beforeunload", stopSpeech);
+    };
   }, []);
 
   const speakText = () => {
@@ -30,8 +40,18 @@ function TextToVoice() {
       if (selectedVoice) utterance.voice = selectedVoice;
       utterance.pitch = 1.3;
       utterance.rate = 1.2;
+    
+      utterance.onstart = () => {
+        onStart?.();
+      }
+
+      utterance.onend = () => {
+        onEnd?.();
+      }
+
       window.speechSynthesis.cancel(); 
       window.speechSynthesis.speak(utterance);
+
     } else {
       alert("Sorry, your browser doesn't support text-to-speech.");
     }
