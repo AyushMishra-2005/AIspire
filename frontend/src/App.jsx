@@ -11,11 +11,31 @@ import { useAuth } from './context/AuthProvider';
 import Logout from './components/logout';
 import InterviewForm from './interview/interviewForm';
 import useConversation from './stateManage/useConversation';
+import { useEffect } from 'react';
+import axios from 'axios'
+import server from './environment';
+import {Navigate} from 'react-router-dom';
 
 function App() {
 
-  const {authUser} = useAuth();
+  const {authUser, setAuthUser} = useAuth();
   const {accessInterviewPage} = useConversation();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try{  
+        const res = await axios.get(
+          `${server}/verify-token`,
+          {withCredentials : true}
+        );
+      }catch(err){
+        localStorage.removeItem('authUserData');
+        setAuthUser(null); 
+      }
+    }
+    checkSession();
+  }, []);
+
 
   return (
     <>
@@ -47,10 +67,9 @@ function App() {
               </>
             } />
             <Route path='/logout' element={authUser? <Logout/> : <HomeComponent />}/>
-            <Route path='/interviewForm' element={authUser? <InterviewForm/> : <Login />}/>
+            <Route path='/interviewForm' element={authUser? <InterviewForm/> : <Navigate to="/login" replace />}/>
           </Routes>
         </div>
-
 
         <Footer />
       </div>

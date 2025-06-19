@@ -14,8 +14,9 @@ function Logout() {
       try {
         const res = await axios.post(`${server}/user/logout`, {}, { withCredentials: true });
         localStorage.removeItem('authUserData');
-        setAuthUser(undefined);
+        setAuthUser(null);
         toast.success("Logged Out!");
+        navigate('/login'); 
       } catch (err) {
         console.log(err);
         toast.error("Fail to Logout!");

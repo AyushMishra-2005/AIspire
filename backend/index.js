@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser'
 import mongoose from 'mongoose'
 import { v2 as cloudinary } from 'cloudinary';
 import userRoute from './route/user.route.js'
+import secureRoute from './middleware/secureRoute.js'
 
 dotenv.config();
 const app = express();
@@ -42,23 +43,12 @@ main();
 app.use('/user', userRoute);
 app.use('/interview', interviewSection);
 
-// app.post("/sendUserMessage", async (req, res) => {
-//   const { search } = req.body;
-
-//   const aiResponse = await axios.post(
-//     "http://localhost:11434/api/generate",
-//     {
-//       "model": "llama3.2",
-//       "prompt": `${search}`,
-//       "stream": false
-//     }
-//   );
-
-//   console.log(aiResponse.data.response);
-
-//   res.status(200).json({message : aiResponse.data.response});
-
-// });
+app.get('/verify-token', secureRoute, (req, res) => {
+  res.status(200).json({
+    message: "Token is valid",
+    user: req.user, 
+  });
+});
 
 app.get("/getImage", (req, res) => {
   const timestamp = Math.round(new Date().getTime() / 1000);

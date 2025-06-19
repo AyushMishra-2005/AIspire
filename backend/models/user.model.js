@@ -29,22 +29,6 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
-    // verifyOtp: {
-    //   type: String,
-    //   default: ""
-    // },
-    // verifyOtpExpireAt: {
-    //   type: Number,
-    //   default: 0
-    // },
-    // resetOtp: {
-    //   type: String,
-    //   default: ""
-    // },
-    // resetOtpExpireAt: {
-    //   type: Number,
-    //   default: 0
-    // }
   },
   {
     timestamps: true,

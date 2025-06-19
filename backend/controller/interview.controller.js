@@ -199,6 +199,9 @@ export const generateQuestions = async (req, res) => {
         }
       }
 
+      data.answers.push(givenAnswer);
+      await data.save();
+
       let responseData = "";
 
       if (!question) {
@@ -301,6 +304,8 @@ export const checkRoleAndTopic = async (req, res) => {
       try {
 
         questions = questions.slice(0, numOfQns);
+
+        console.log(questions);
 
         await InterviewData.findOneAndDelete({ email });
 
