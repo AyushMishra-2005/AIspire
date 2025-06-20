@@ -6,10 +6,14 @@ import StoreOTP from '../models/otp.model.js'
 
 export const signup = async (req, res) => {
   try {
-    const { username, name, email, password, confirmpassword, profilePicURL } = req.body;
+    let { username, name, email, password, confirmpassword, profilePicURL, signupWithGoogle } = req.body;
 
-    if (password !== confirmpassword) {
+    if (!signupWithGoogle && password !== confirmpassword) {
       return res.status(400).json({ message: "Password do not match" });
+    }
+
+    if (!username || !name || !email || !profilePicURL) {
+      return res.status(400).json({ message: "Please provide valid data!" });
     }
 
     const user = await User.findOne({ $or: [{ email }, { username }] });
@@ -18,15 +22,27 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "User already exists with this email or username" });
     }
 
-    const hash = await bcrypt.hash(password, 10);
+    let newUser;
 
-    const newUser = new User({
-      username,
-      name,
-      email,
-      password: hash,
-      profilePicURL,
-    });
+    if (!signupWithGoogle) {
+      const hash = await bcrypt.hash(password, 10);
+
+      newUser = new User({
+        username,
+        name,
+        email,
+        password: hash,
+        profilePicURL,
+      });
+    } else {
+      newUser = new User({
+        username,
+        name,
+        email,
+        profilePicURL,
+        signupWithGoogle: true
+      });
+    }
 
     await newUser.save().then(() => {
       console.log("User saved successfully!");
@@ -201,9 +217,9 @@ export const verifyOtp = async (req, res) => {
       valid = true;
     }
 
-    
+
     return res.status(200).json({ message: "OTP checked", valid });
-  
+
 
   } catch (err) {
     console.log("error in verifyOtp : ", err);

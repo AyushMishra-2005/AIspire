@@ -15,6 +15,8 @@ import { useEffect } from 'react';
 import axios from 'axios'
 import server from './environment';
 import {Navigate} from 'react-router-dom';
+import QuizPage from './quiz/QuizPage';
+import QuizStart from './quiz/QuizeStart';
 
 function App() {
 
@@ -68,6 +70,8 @@ function App() {
             } />
             <Route path='/logout' element={authUser? <Logout/> : <HomeComponent />}/>
             <Route path='/interviewForm' element={authUser? <InterviewForm/> : <Navigate to="/login" replace />}/>
+            <Route path='/quiz' element={authUser? <QuizPage/> : <Navigate to="/login" replace />}/>
+            <Route path='/quiz/start' element={authUser? <QuizStart/> : <Navigate to="/login" replace />}/>
           </Routes>
         </div>
 

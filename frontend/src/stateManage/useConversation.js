@@ -22,6 +22,9 @@ const useConversation = create((set) => ({
     numOfQns: 0,
   },
   setInterviewData: (interviewData) => set({ interviewData }),
+
+  quizData : [],
+  setQuizData : (quizData) => set({quizData}),
 }));
 
 export default useConversation;

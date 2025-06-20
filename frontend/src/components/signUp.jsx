@@ -19,6 +19,8 @@ import axios from 'axios'
 import server from '../environment.js'
 import { useAuth } from '../context/AuthProvider.jsx'
 import { toast } from 'react-hot-toast'
+import { useGoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
 
 
 function SignUp() {
@@ -102,6 +104,61 @@ function SignUp() {
     setErrors(newErrors);
     return !Object.values(newErrors).some(error => error);
   };
+
+  const handleGoogleSignUp = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const res = await axios.get(
+          "https://www.googleapis.com/oauth2/v3/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${response.access_token}`,
+            }
+          }
+        );
+
+        const userInfo = res.data;
+        console.log("Google User Info:", userInfo);
+
+
+        const userDetails = {
+          name: userInfo.given_name + " " + userInfo.family_name,
+          email: userInfo.email,
+          username : userInfo.email.split("@")[0],
+          profilePicURL: userInfo.picture,
+          signupWithGoogle : true,
+        }
+
+        console.log(userDetails);
+
+        await axios.post(
+          `${server}/user/signup`,
+          userDetails,
+          { withCredentials: true }
+        )
+          .then((response) => {
+            if (response.data) {
+              toast.success("SignUp successful you can login now.");
+            }
+            console.log(response.data);
+            localStorage.setItem("authUserData", JSON.stringify(response.data));
+            setAuthUser(response.data);
+            setLoading(false);
+          })
+          .catch((err) => {
+            console.log("Error in signup page : ", err);
+            setLoading(false);
+          });
+
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    onError: (err) => {
+      console.log(err)
+    },
+  });
 
   const handleVerifyOtp = async () => {
     if (!formData.email) {
@@ -188,6 +245,7 @@ function SignUp() {
       confirmpassword: formData.confirmPassword,
       profilePicURL: imageURL,
       otp: formData.otp,
+      signupWithGoogle : false,
     }
 
     if (!imageURL || imageURL.trim() === "") {
@@ -593,9 +651,9 @@ function SignUp() {
                 backgroundColor: '#1565c0'
               },
               '&.Mui-disabled': {
-                backgroundColor: '#90caf9', 
-                color: '#fff',              
-                boxShadow: 'none'          
+                backgroundColor: '#90caf9',
+                color: '#fff',
+                boxShadow: 'none'
               },
               backdropFilter: 'blur(5px)',
               boxShadow: '0 4px 15px rgba(25, 118, 210, 0.3)'
@@ -624,6 +682,7 @@ function SignUp() {
               background: 'rgba(30, 30, 30, 0.3)',
               mb: 2
             }}
+            onClick={handleGoogleSignUp}
           >
             Continue with Google
           </Button>

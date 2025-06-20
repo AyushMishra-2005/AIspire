@@ -8,6 +8,7 @@ import mongoose from 'mongoose'
 import { v2 as cloudinary } from 'cloudinary';
 import userRoute from './route/user.route.js'
 import secureRoute from './middleware/secureRoute.js'
+import quizRoute from './route/quiz.route.js'
 
 dotenv.config();
 const app = express();
@@ -42,6 +43,7 @@ main();
 
 app.use('/user', userRoute);
 app.use('/interview', interviewSection);
+app.use('/quiz', quizRoute);
 
 app.get('/verify-token', secureRoute, (req, res) => {
   res.status(200).json({
