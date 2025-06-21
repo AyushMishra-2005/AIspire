@@ -106,34 +106,15 @@ function SignUp() {
   };
 
   const handleGoogleSignUp = useGoogleLogin({
+    flow: 'auth-code',
     onSuccess: async (response) => {
       try {
-        const res = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: {
-              Authorization: `Bearer ${response.access_token}`,
-            }
-          }
-        );
 
-        const userInfo = res.data;
-        console.log("Google User Info:", userInfo);
-
-
-        const userDetails = {
-          name: userInfo.given_name + " " + userInfo.family_name,
-          email: userInfo.email,
-          username : userInfo.email.split("@")[0],
-          profilePicURL: userInfo.picture,
-          signupWithGoogle : true,
-        }
-
-        console.log(userDetails);
+        const withGoogle = true;
 
         await axios.post(
           `${server}/user/signup`,
-          userDetails,
+          {code: response.code, withGoogle},
           { withCredentials: true }
         )
           .then((response) => {
@@ -148,6 +129,9 @@ function SignUp() {
           .catch((err) => {
             console.log("Error in signup page : ", err);
             setLoading(false);
+            if(err.response && err.response.data){
+              toast.error(err.response.data.message);
+            }
           });
 
       } catch (err) {
@@ -245,7 +229,7 @@ function SignUp() {
       confirmpassword: formData.confirmPassword,
       profilePicURL: imageURL,
       otp: formData.otp,
-      signupWithGoogle : false,
+      withGoogle : false,
     }
 
     if (!imageURL || imageURL.trim() === "") {

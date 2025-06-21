@@ -17,6 +17,7 @@ import axios from 'axios'
 import server from '../environment.js'
 import { useAuth } from '../context/AuthProvider.jsx'
 import { LoaderIcon, toast } from 'react-hot-toast'
+import { useGoogleLogin } from '@react-oauth/google'
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -60,11 +61,11 @@ function Login() {
     try {
       const { data } = await axios.post(
         `${server}/user/sendOTP`,
-        { email : formData.email },
+        { email: formData.email },
         { withCredentials: true }
       );
 
-      if(data){
+      if (data) {
         toast.success('OTP send Successfully');
       }
     } catch (err) {
@@ -80,7 +81,7 @@ function Login() {
       return;
     }
 
-    if(!formData.otp){
+    if (!formData.otp) {
       setErrors(prev => ({ ...prev, otp: true }));
       return;
     }
@@ -88,14 +89,14 @@ function Login() {
     try {
       const { data } = await axios.post(
         `${server}/user/verifyOTP`,
-        { 
-          email : formData.email,
-          otp : formData.otp
+        {
+          email: formData.email,
+          otp: formData.otp
         },
         { withCredentials: true }
       );
 
-      if(!data.valid){
+      if (!data.valid) {
         toast.error('Wrong OTP!');
       }
       return data.valid;
@@ -103,8 +104,43 @@ function Login() {
       console.log(err);
       toast.error('OTP Verify Failed!');
     }
-    
+
   }
+
+  const handleGoogleLogin = useGoogleLogin({
+    flow: 'auth-code',
+    onSuccess: async (response) => {
+      try {
+        const withGoogle = true;
+
+        await axios.post(
+          `${server}/user/login`, 
+          {code: response.code, withGoogle}, 
+          {
+            withCredentials: true,
+          }
+        )
+          .then((response) => {
+            if (response.data) {
+              toast.success("User Logged In Successful!");
+            } else {
+              toast.error("User Logged In fail!");
+              return;
+            }
+
+            localStorage.setItem("authUserData", JSON.stringify(response.data));
+            setAuthUser(response.data);
+          })
+          .catch((err) => {
+            console.log("Error in login : ", err);
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    onError: (err) => console.log(err)
+  });
 
   const validateForm = () => {
     const newErrors = {
@@ -125,7 +161,7 @@ function Login() {
 
     const valid = await handleVerifyOtp();
 
-    if(!valid){
+    if (!valid) {
       return;
     }
 
@@ -134,6 +170,7 @@ function Login() {
       password: formData.password,
       confirmpassword: formData.confirmPassword,
       otp: formData.otp,
+      withGoogle : false,
     }
 
     console.log(userInfo);
@@ -431,6 +468,7 @@ function Login() {
               background: 'rgba(30, 30, 30, 0.3)',
               mb: 2
             }}
+            onClick={handleGoogleLogin}
           >
             Continue with Google
           </Button>

@@ -6,9 +6,9 @@ import StoreOTP from '../models/otp.model.js'
 
 export const signup = async (req, res) => {
   try {
-    let { username, name, email, password, confirmpassword, profilePicURL, signupWithGoogle } = req.body;
+    let { username, name, email, password, confirmpassword, profilePicURL, withGoogle } = req.body;
 
-    if (!signupWithGoogle && password !== confirmpassword) {
+    if (!withGoogle && password !== confirmpassword) {
       return res.status(400).json({ message: "Password do not match" });
     }
 
@@ -24,7 +24,7 @@ export const signup = async (req, res) => {
 
     let newUser;
 
-    if (!signupWithGoogle) {
+    if (!withGoogle) {
       const hash = await bcrypt.hash(password, 10);
 
       newUser = new User({
@@ -98,7 +98,7 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, withGoogle } = req.body;
 
     const user = await User.findOne({ email });
 
@@ -110,10 +110,12 @@ export const login = async (req, res) => {
       return res.status(404).json({ message: "Account deleted! Can not login!" });
     }
 
-    const compPass = await bcrypt.compare(password, user.password);
+    if (!withGoogle) {
+      const compPass = await bcrypt.compare(password, user.password);
 
-    if (!compPass) {
-      return res.status(404).json({ message: "Wrong password" });
+      if (!compPass) {
+        return res.status(404).json({ message: "Wrong password" });
+      }
     }
 
     createTokenAndSaveCookie(user._id, res);

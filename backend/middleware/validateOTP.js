@@ -1,9 +1,9 @@
 import StoreOTP from "../models/otp.model.js";
 
 const validateOTP = async (req, res, next) => {
-  const { email, otp, signupWithGoogle } = req.body;
+  const { email, otp, withGoogle } = req.body;
 
-  if(signupWithGoogle){
+  if(withGoogle){
     return next();
   }
 
