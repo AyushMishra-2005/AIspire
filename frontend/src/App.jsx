@@ -17,6 +17,8 @@ import server from './environment';
 import {Navigate} from 'react-router-dom';
 import QuizPage from './quiz/QuizPage';
 import QuizStart from './quiz/QuizeStart';
+import ResumeLandingPage from './resumeBuilder/resumeLandingPage';
+import ResumeForm from './resumeBuilder/resumeForm';
 
 function App() {
 
@@ -72,6 +74,8 @@ function App() {
             <Route path='/interviewForm' element={authUser? <InterviewForm/> : <Navigate to="/login" replace />}/>
             <Route path='/quiz' element={authUser? <QuizPage/> : <Navigate to="/login" replace />}/>
             <Route path='/quiz/start' element={authUser? <QuizStart/> : <Navigate to="/login" replace />}/>
+            <Route path='/resume' element={authUser? <ResumeLandingPage/> : <Navigate to="/login" replace />}/>
+            <Route path='/resume/resumeForm' element={authUser? <ResumeForm/> : <Navigate to="/login" replace />}/>
           </Routes>
         </div>
 

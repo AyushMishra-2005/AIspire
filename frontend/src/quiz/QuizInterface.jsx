@@ -3,26 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import QuizResult from './QuizResult.jsx';
 import useConversation from '../stateManage/useConversation.js';
 
-// const sampleQuestions = [
-//   {
-//     q: "How many stripes are there on the US flag?",
-//     options: ["13", "15", "21", "23"],
-//     correct: "13"
-//   },
-//   {
-//     q: "What does HTML stand for?",
-//     options: ["Hyper Trainer Marking Language", "Hyper Text Markup Language", "High Text Machine Language", "None"],
-//     correct: "Hyper Text Markup Language"
-//   },
-//   {
-//     q: "What is the capital of France?",
-//     options: ["Berlin", "Madrid", "Paris", "Lisbon"],
-//     correct: "Paris"
-//   }
-// ];
-
-
-
 const QuizInterface = ({ config }) => {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);

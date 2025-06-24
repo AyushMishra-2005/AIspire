@@ -70,10 +70,12 @@ export const checkRoleAndTopicQuiz = async (req, res) => {
         stream: false,
         format: "json",
         options: {
-          temperature: 0.7
+          temperature: 0.8,        
+          presence_penalty: 0.6,   
+          frequency_penalty: 0.6  
         }
       }
-    );
+    ); 
 
     let rawdata = aiResponse.data.response;
 

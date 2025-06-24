@@ -24,6 +24,7 @@ export function NavbarDemo() {
     { name: "Home", link: "/" },
     { name: "Interview", link: "/interviewForm" },
     { name: "Quiz", link: "/quiz" },
+    { name: "Resume", link: "/resume" },
   ];
 
   return (
