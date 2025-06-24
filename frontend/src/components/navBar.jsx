@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom'
-import Avatar from '@mui/material/Avatar';
+import { useNavigate } from "react-router-dom";
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import {
   Navbar,
   NavBody,
@@ -13,43 +15,105 @@ import {
   MobileNavMenu,
 } from "../components/ui/resizable-navbar.jsx";
 import { useAuth } from "../context/AuthProvider.jsx";
-import { toast } from "react-hot-toast";
 
 export function NavbarDemo() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const { authUser } = useAuth();
 
   const navItems = [
     { name: "Home", link: "/" },
+    { name: "Contact", link: "/" },
+  ];
+
+  const features = [
     { name: "Interview", link: "/interviewForm" },
     { name: "Quiz", link: "/quiz" },
     { name: "Resume", link: "/resume" },
   ];
 
+  const allNavFeatures = navItems.concat(features);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
-    <div className="relative w-[100vw]">
-      <Navbar>
-        {/* Desktop Navigation */}
+    <div className="relative w-full z-50">
+      <Navbar className="relative z-50">
         <NavBody>
           <NavbarLogo />
           <NavItems items={navItems} />
-          <div className="flex items-center gap-4">
-            {
-              authUser ? <NavbarButton variant="secondary" onClick={() => navigate("/logout")}>
+          <div className="flex items-center gap-4 z-50">
+            <button
+              onClick={handleMenuOpen}
+              className="px-4 py-2 rounded-md bg-white text-gray-800 font-medium shadow-sm hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+            >
+              Features
+            </button>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              PaperProps={{
+                sx: {
+                  backgroundColor: "#1f2937", // gray-800
+                  color: "white",
+                  mt: 1,
+                  zIndex: 1400,
+                },
+              }}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              {features.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  onClick={() => {
+                    navigate(item.link);
+                    handleMenuClose();
+                  }}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#374151",
+                    },
+                  }}
+                >
+                  {item.name}
+                </MenuItem>
+              ))}
+            </Menu>
+
+            {/* Login/Logout */}
+            {authUser ? (
+              <NavbarButton variant="secondary" onClick={() => navigate("/logout")}>
                 Logout
-              </NavbarButton> : <NavbarButton variant="secondary" onClick={() => navigate("/login")}>
+              </NavbarButton>
+            ) : (
+              <NavbarButton variant="secondary" onClick={() => navigate("/login")}>
                 Login
               </NavbarButton>
-            }
-            <NavbarButton variant="primary">Book a call</NavbarButton>
-            {
-              authUser && <Avatar
-                alt="Remy Sharp"
+            )}
+
+            {/* Avatar */}
+            {authUser && (
+              <Avatar
+                alt="User"
                 src={authUser.user.profilePicURL}
                 sx={{ width: 48, height: 48 }}
               />
-            }
+            )}
           </div>
         </NavBody>
 
@@ -62,13 +126,13 @@ export function NavbarDemo() {
                 isOpen={isMobileMenuOpen}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               />
-              {
-                authUser && <Avatar
-                  alt="Remy Sharp"
+              {authUser && (
+                <Avatar
+                  alt="User"
                   src={authUser.user.profilePicURL}
                   sx={{ width: 48, height: 48 }}
                 />
-              }
+              )}
             </div>
           </MobileNavHeader>
 
@@ -76,7 +140,7 @@ export function NavbarDemo() {
             isOpen={isMobileMenuOpen}
             onClose={() => setIsMobileMenuOpen(false)}
           >
-            {navItems.map((item, idx) => (
+            {allNavFeatures.map((item, idx) => (
               <a
                 key={idx}
                 href={item.link}
@@ -87,35 +151,29 @@ export function NavbarDemo() {
               </a>
             ))}
             <div className="flex w-full flex-col gap-4">
-              {
-                authUser ? <NavbarButton
+              {authUser ? (
+                <NavbarButton
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    navigate('/logout');
+                    navigate("/logout");
                   }}
                   variant="primary"
                   className="w-full"
                 >
                   Logout
-                </NavbarButton> : <NavbarButton
+                </NavbarButton>
+              ) : (
+                <NavbarButton
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    navigate('/login');
+                    navigate("/login");
                   }}
                   variant="primary"
                   className="w-full"
                 >
                   Login
                 </NavbarButton>
-              }
-
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Book a call
-              </NavbarButton>
+              )}
             </div>
           </MobileNavMenu>
         </MobileNav>
@@ -123,4 +181,3 @@ export function NavbarDemo() {
     </div>
   );
 }
-
