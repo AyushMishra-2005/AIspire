@@ -14,7 +14,6 @@ function WorkExperienceForm() {
 
   return (
     <div className="space-y-2 p-2 flex flex-col h-full">
-      {/* Heading */}
       <div>
         <h2 className="text-xl font-semibold text-white mt-2 border-b border-white/10 pb-2">
           Work Experience
@@ -26,7 +25,6 @@ function WorkExperienceForm() {
           key={exp.id}
           className="relative border border-white/10 rounded-lg p-4 space-y-4 bg-white/5"
         >
-          {/* Delete Button */}
           {workExperiences.length > 1 && (
             <button
               onClick={() => removeWorkExperience(exp.id)}
@@ -37,7 +35,7 @@ function WorkExperienceForm() {
             </button>
           )}
 
-          {/* Company & Role */}
+          
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <label htmlFor={`company-${exp.id}`} className="block text-sm font-medium text-gray-300 mb-1">
@@ -68,7 +66,7 @@ function WorkExperienceForm() {
             </div>
           </div>
 
-          {/* Start & End Date */}
+          
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <label htmlFor={`startDate-${exp.id}`} className="block text-sm font-medium text-gray-300 mb-1">
@@ -97,7 +95,6 @@ function WorkExperienceForm() {
             </div>
           </div>
 
-          {/* Description */}
           <div>
             <label htmlFor={`description-${exp.id}`} className="block text-sm font-medium text-gray-300 mb-1">
               Description
@@ -114,7 +111,6 @@ function WorkExperienceForm() {
         </div>
       ))}
 
-      {/* Add Work Experience Button */}
       <div className="mt-auto">
         <button
           onClick={addWorkExperience}

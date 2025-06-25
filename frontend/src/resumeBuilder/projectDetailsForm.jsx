@@ -25,7 +25,7 @@ function ProjectDetailsForm() {
           key={project.id}
           className="relative border border-white/10 rounded-lg p-4 space-y-4 bg-white/5"
         >
-          {/* Delete Button */}
+          
           {projects.length > 1 && (
             <button
               onClick={() => removeProject(project.id)}
@@ -36,7 +36,7 @@ function ProjectDetailsForm() {
             </button>
           )}
 
-          {/* Project Title */}
+          
           <div className="flex-1">
             <label htmlFor={`projectTitle-${project.id}`} className="block text-sm font-medium text-gray-300 mb-1">
               Project Title
@@ -51,7 +51,7 @@ function ProjectDetailsForm() {
             />
           </div>
 
-          {/* Description */}
+          
           <div>
             <label htmlFor={`description-${project.id}`} className="block text-sm font-medium text-gray-300 mb-1">
               Description
@@ -66,7 +66,7 @@ function ProjectDetailsForm() {
             />
           </div>
 
-          {/* Links */}
+          
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <label htmlFor={`githubLink-${project.id}`} className="block text-sm font-medium text-gray-300 mb-1">
@@ -99,7 +99,7 @@ function ProjectDetailsForm() {
         </div>
       ))}
 
-      {/* Add Project Button */}
+      
       <div className="mt-auto">
         <button
           onClick={addProject}

@@ -14,7 +14,6 @@ function EducationForm() {
 
   return (
     <div className="space-y-4 p-2 flex flex-col h-full">
-      {/* Heading */}
       <div>
         <h2 className="text-xl font-semibold text-white mt-2 border-b border-white/10 pb-2">
           Education
@@ -26,7 +25,6 @@ function EducationForm() {
           key={edu.id}
           className="border border-white/10 rounded-lg p-4 space-y-4 bg-white/5 relative"
         >
-          {/* Delete Button */}
           {educations.length > 1 && (
             <button
               onClick={() => removeEducation(edu.id)}
@@ -89,7 +87,6 @@ function EducationForm() {
         </div>
       ))}
 
-      {/* Add Education Button */}
       <div className="mt-auto">
         <button
           onClick={addEducation}

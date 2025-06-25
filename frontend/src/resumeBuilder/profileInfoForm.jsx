@@ -26,7 +26,6 @@ function ProfileInfoForm() {
           />
         </div>
         
-        {/* Designation Input */}
         <div className="flex-1">
           <label htmlFor="designation" className="block text-sm font-medium text-gray-300 mb-1">
             Designation
@@ -42,7 +41,6 @@ function ProfileInfoForm() {
         </div>
       </div>
       
-      {/* Summary Textarea */}
       <div>
         <label htmlFor="summary" className="block text-sm font-medium text-gray-300 mb-1">
           Summary

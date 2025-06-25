@@ -39,7 +39,7 @@ function ContactInfoForm() {
           />
         </div>
 
-        {/* Designation Input */}
+        
         <div className="flex-1">
           <label htmlFor="designation" className="block text-sm font-medium text-gray-300 mb-1">
             Phone Number
@@ -70,7 +70,6 @@ function ContactInfoForm() {
           />
         </div>
 
-        {/* Designation Input */}
         <div className="flex-1">
           <label htmlFor="designation" className="block text-sm font-medium text-gray-300 mb-1">
             GintHub
@@ -99,7 +98,6 @@ function ContactInfoForm() {
           placeholder="https://yourwebsite.com"
         />
       </div>
-
 
     </div>
   )
