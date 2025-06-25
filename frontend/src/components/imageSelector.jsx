@@ -1,27 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Upload, Trash2, User } from 'lucide-react';
 
-function ImageSelector() {
-  const [image, setImage] = useState(null);
+function ImageSelector({onImageChange, setImageUrl}) {
+  const [image, setImage] = useState(setImageUrl || null);
+
+  useEffect(() => {
+    setImage(setImageUrl);
+  }, [setImageUrl]);
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
+      onImageChange?.(imageUrl)
     }
   };
 
   const handleRemove = () => {
     setImage(null);
+    onImageChange?.(null)
   };
+
+  console.log(setImageUrl);
 
   return (
     <div className="relative w-30 h-30 mx-auto mt-6 z-10">
       <div className="w-full h-full rounded-full bg-white/5 border border-white/20 backdrop-blur-sm shadow-md flex items-center justify-center relative z-0">
 
         {/* Image or default user icon */}
-        {image ? (
+        {image? (
           <img
             src={image}
             alt="Profile"
@@ -33,7 +41,7 @@ function ImageSelector() {
 
         {/* Floating Button (Upload/Delete) */}
         <div className="absolute bottom-0 right-0 z-10">
-          {!image ? (
+          {!image? (
             <label className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-700 cursor-pointer shadow-lg border-2 border-white transform translate-x-[0%] translate-y-[0%] z-10">
               <Upload className="w-4 h-4 text-white" />
               <input

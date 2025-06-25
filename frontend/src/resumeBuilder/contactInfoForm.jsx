@@ -1,6 +1,10 @@
 import React from 'react'
+import useResumeStore from '../stateManage/useResumeStore';
 
 function ContactInfoForm() {
+
+  const {resumeData, updateResumeField} = useResumeStore();
+
   return (
     <div className="space-y-6 p-2 flex flex-col justify-evenly">
 
@@ -21,6 +25,10 @@ function ContactInfoForm() {
                       text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                       focus:ring-blue-500/50 focus:border-transparent transition-all"
           placeholder="Short Address"
+          onChange={(e) => {
+            updateResumeField('contactInfo', 'location', e.target.value);
+          }}
+          value={resumeData.contactInfo?.location}
         />
       </div>
 
@@ -36,10 +44,14 @@ function ContactInfoForm() {
                       text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                       focus:ring-blue-500/50 focus:border-transparent transition-all"
             placeholder="John@gmail.com"
+            onChange={(e) => {
+              updateResumeField('contactInfo', 'email', e.target.value);
+            }}
+            value={resumeData.contactInfo?.email}
           />
         </div>
 
-        
+
         <div className="flex-1">
           <label htmlFor="designation" className="block text-sm font-medium text-gray-300 mb-1">
             Phone Number
@@ -51,6 +63,10 @@ function ContactInfoForm() {
                       text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                       focus:ring-blue-500/50 focus:border-transparent transition-all"
             placeholder="9078343277"
+            onChange={(e) => {
+              updateResumeField('contactInfo', 'phone', e.target.value);
+            }}
+            value={resumeData.contactInfo?.phone}
           />
         </div>
       </div>
@@ -67,12 +83,16 @@ function ContactInfoForm() {
                       text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                       focus:ring-blue-500/50 focus:border-transparent transition-all"
             placeholder="https://linkedin.com/in/username"
+            onChange={(e) => {
+              updateResumeField('contactInfo', 'linkedin', e.target.value);
+            }}
+            value={resumeData.contactInfo?.linkedin}
           />
         </div>
 
         <div className="flex-1">
           <label htmlFor="designation" className="block text-sm font-medium text-gray-300 mb-1">
-            GintHub
+            GitHub
           </label>
           <input
             type="text"
@@ -81,6 +101,10 @@ function ContactInfoForm() {
                       text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                       focus:ring-blue-500/50 focus:border-transparent transition-all"
             placeholder="https://github.com/username"
+            onChange={(e) => {
+              updateResumeField('contactInfo', 'github', e.target.value);
+            }}
+            value={resumeData.contactInfo?.github}
           />
         </div>
       </div>
@@ -96,6 +120,10 @@ function ContactInfoForm() {
                       text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                       focus:ring-blue-500/50 focus:border-transparent transition-all"
           placeholder="https://yourwebsite.com"
+          onChange={(e) => {
+            updateResumeField('contactInfo', 'website', e.target.value);
+          }}
+          value={resumeData.contactInfo?.website}
         />
       </div>
 

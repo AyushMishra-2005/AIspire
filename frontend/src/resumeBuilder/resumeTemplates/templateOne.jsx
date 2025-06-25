@@ -23,7 +23,9 @@ const TemplateOne = forwardRef((props, ref) => {
         fontFamily: 'Arial, sans-serif',
         backgroundColor: '#fff',
         color: '#000',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        overflowWrap: 'break-word',
+        wordBreak: 'break-word'
       }}
     >
       {/* Sidebar */}

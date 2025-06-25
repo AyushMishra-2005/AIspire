@@ -1,7 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ImageSelector from '../components/imageSelector';
+import useResumeStore from '../stateManage/useResumeStore';
 
 function ProfileInfoForm() {
+
+  const [imageUrl, setImageUrl] = useState();
+  const {resumeData, setResumeData, updateResumeField} = useResumeStore();
+
+  const handleProfileImageChange = (imageUrl) => {
+    setImageUrl(imageUrl);
+    updateResumeField('profileInfo', 'profilePreviewUrl', imageUrl);
+  }
+
   return (
     <div className="space-y-6 p-2">
 
@@ -9,7 +19,7 @@ function ProfileInfoForm() {
         Personal Information
       </h2>
 
-      <ImageSelector/>
+      <ImageSelector onImageChange={handleProfileImageChange} setImageUrl={resumeData.profileInfo.profilePreviewUrl}/>
       
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
@@ -23,6 +33,10 @@ function ProfileInfoForm() {
                       text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                       focus:ring-blue-500/50 focus:border-transparent transition-all"
             placeholder="John Doe"
+            onChange={(e) => {
+              updateResumeField('profileInfo', 'fullName', e.target.value);
+            }}
+            value={resumeData.profileInfo?.fullName}
           />
         </div>
         
@@ -37,6 +51,10 @@ function ProfileInfoForm() {
                       text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                       focus:ring-blue-500/50 focus:border-transparent transition-all"
             placeholder="Frontend Developer"
+            onChange={(e) => {
+              updateResumeField('profileInfo', 'designation', e.target.value);
+            }}
+            value={resumeData.profileInfo?.designation}
           />
         </div>
       </div>
@@ -52,6 +70,10 @@ function ProfileInfoForm() {
                     text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                     focus:ring-blue-500/50 focus:border-transparent transition-all"
           placeholder="A passionate frontend developer with 5+ years of experience..."
+          onChange={(e) => {
+            updateResumeField('profileInfo', 'summary', e.target.value);
+          }}
+          value={resumeData.profileInfo?.summary}
         />
       </div>
     </div>
