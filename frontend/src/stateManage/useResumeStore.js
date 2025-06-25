@@ -81,7 +81,45 @@ const useResumeStore = create((set) => ({
         },
       },
     }));
+  },
+
+  updateArrayItemField: (section, index, key, value) => {
+    set((state) => {
+      const updated = [...state.resumeData[section]];
+      updated[index] = {...updated[index], [key]: value};
+      return{
+        resumeData: {
+          ...state.resumeData,
+          [section]: updated
+        },
+      };
+    });
+  },
+
+
+  addArrayItem: (section, emptyItem) => {
+    set((state) => ({
+      resumeData: {
+        ...state.resumeData,
+        [section]: [...state.resumeData[section], emptyItem]
+      }
+    }));
+  },
+
+  removeArrayItem: (section, index) => {
+    set((state) => {
+      const updated = [...state.resumeData[section]];
+      updated.splice(index, 1);
+
+      return{
+        resumeData: {
+          ...state.resumeData,
+          [section]: updated,
+        }
+      }
+    });
   }
+
 
 }));
 
