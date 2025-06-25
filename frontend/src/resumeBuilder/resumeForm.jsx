@@ -84,7 +84,7 @@ function ResumeForm() {
         </div>
 
         <div className="w-[90vw] flex flex-col lg:flex-row justify-between gap-6 mt-8">
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 w-full lg:w-1/2 h-[75vh] min-h-[500px] rounded-2xl shadow-2xl text-white p-4">
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 w-full lg:w-1/2 h-[75vh] min-h-[500px] rounded-2xl shadow-2xl text-white p-4 z-10">
             <div className="flex flex-col justify-between h-full">
               <StepProgress progress={formSteps[currentStep].progress} />
 
