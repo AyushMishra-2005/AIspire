@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -21,6 +21,18 @@ const modalStyle = {
 };
 
 const ResumeModal = ({ open, handleClose, title, setTitle, handleSubmit }) => {
+  const [titleError, setTitleError] = useState(false);
+
+  const onSubmit = () => {
+    if (!title.trim()) {
+      setTitleError(true);
+      return;
+    }
+
+    setTitleError(false);
+    handleSubmit(); 
+  };
+
   return (
     <Modal
       open={open}
@@ -50,7 +62,12 @@ const ResumeModal = ({ open, handleClose, title, setTitle, handleSubmit }) => {
           label="Resume Title"
           variant="outlined"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            if (titleError) setTitleError(false); 
+          }}
+          error={titleError}
+          helperText={titleError ? "Resume title is required" : ""}
           sx={{
             input: { color: 'white' },
             label: { color: '#bbb' },
@@ -65,7 +82,7 @@ const ResumeModal = ({ open, handleClose, title, setTitle, handleSubmit }) => {
         <Button
           variant="contained"
           fullWidth
-          onClick={handleSubmit}
+          onClick={onSubmit}
           sx={{
             background: 'linear-gradient(to right, #4facfe, #00f2fe)',
             color: 'white',

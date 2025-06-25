@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './resume.css';
 import { Pen, Palette, Trash2, ArrowDownToLine, ArrowLeft, Save, ArrowRight } from "lucide-react";
 import StepProgress from './stepProgress';
@@ -11,6 +11,11 @@ import EducationForm from './educationForm.jsx'
 import SkillInfoForm from './skillInfoForm.jsx'
 import ProjectDetailsForm from './projectDetailsForm.jsx';
 import ResumeModal from './resumeModal.jsx';
+import useResumeStore from '../stateManage/useResumeStore.js';
+import TemplateOne from './resumeTemplates/templateOne.jsx';
+import html2canvas from 'html2canvas';
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js';
 
 const formSteps = [
   { component: <ProfileInfoForm />, label: 'Profile Info', progress: 0 },
@@ -27,13 +32,18 @@ function ResumeForm() {
   const [direction, setDirection] = useState(1);
   const [currentStep, setCurrentStep] = useState(0);
   const stepProgress = ((currentStep + 1) / formSteps.length) * 100;
+  const { resumeData, setResumeData } = useResumeStore();
+  const templateRef = useRef();
 
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSubmit = () => {
-    console.log("Resume Title:", title);
+    setResumeData({
+      ...resumeData,
+      title: title,
+    });
     handleClose();
   }
 
@@ -51,6 +61,32 @@ function ResumeForm() {
     }
   }
 
+ 
+  const handleDownloadPDF = () => {
+    const element = templateRef.current;
+    const opt = {
+      margin: 0,
+      filename: 'resume.pdf',
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: true,
+        scrollY: 0
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+      },
+      
+    };
+
+    html2pdf().set(opt).from(element).toPdf().get('pdf').save();
+  };
+
+
+
   return (
     <>
       <div className="gradient-bg min-h-screen w-screen flex flex-col items-center pt-4">
@@ -59,8 +95,8 @@ function ResumeForm() {
   flex items-center justify-between px-6 text-white text-lg font-medium mt-[50px]">
 
           <div className="flex items-center gap-3">
-            <span className="text-white font-semibold text-xl">Frontend Developer</span>
-            <Pen className="w-5 h-5 text-gray-300 hover:text-white cursor-pointer transition-colors" 
+            <span className="text-white font-semibold text-xl">{resumeData?.title}</span>
+            <Pen className="w-5 h-5 text-gray-300 hover:text-white cursor-pointer transition-colors"
               onClick={handleOpen}
             />
           </div>
@@ -76,7 +112,9 @@ function ResumeForm() {
               <span className="hidden md:block text-red-300">Delete</span>
             </button>
 
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-sm transition-all duration-200">
+            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/10 hover:bg-green-500/20 text-sm transition-all duration-200"
+              onClick={handleDownloadPDF}
+            >
               <ArrowDownToLine className="w-5 h-5 text-green-400" />
               <span className="hidden md:block text-green-300">Download</span>
             </button>
@@ -134,8 +172,10 @@ function ResumeForm() {
           </div>
 
           {/* Right Container */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 w-full lg:w-1/2 h-[75vh] min-h-[500px] rounded-2xl shadow-2xl p-6 text-white">
-            Right Container
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 w-full lg:w-1/2 h-[75vh] min-h-[500px] rounded-2xl shadow-2xl p-6 text-white z-10">
+            <div className="overflow-y-auto h-full relative">
+              <TemplateOne ref={templateRef} />
+            </div>
           </div>
         </div>
       </div>

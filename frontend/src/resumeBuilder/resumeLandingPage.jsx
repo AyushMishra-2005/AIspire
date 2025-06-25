@@ -4,16 +4,21 @@ import Lottie from 'lottie-react';
 import resumeAnim from '../assets/animations/resume.json';
 import { useNavigate } from 'react-router-dom';
 import ResumeModal from './resumeModal'; 
+import useResumeStore from '../stateManage/useResumeStore';
 
 function ResumeLandingPage() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
+  const {resumeData, setResumeData} = useResumeStore();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSubmit = () => {
-    console.log("Resume Title:", title);
+    setResumeData({
+      ...resumeData,
+      title : title,
+    });
     handleClose();
     navigate('/resume/resumeForm');
   };
