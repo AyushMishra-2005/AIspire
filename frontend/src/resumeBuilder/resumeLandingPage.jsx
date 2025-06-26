@@ -3,21 +3,21 @@ import './resume.css';
 import Lottie from 'lottie-react';
 import resumeAnim from '../assets/animations/resume.json';
 import { useNavigate } from 'react-router-dom';
-import ResumeModal from './resumeModal'; 
+import ResumeModal from './resumeModal';
 import useResumeStore from '../stateManage/useResumeStore';
 
 function ResumeLandingPage() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
-  const {resumeData, setResumeData} = useResumeStore();
+  const { resumeData, setResumeData } = useResumeStore();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleSubmit = () => {
     setResumeData({
       ...resumeData,
-      title : title,
+      title: title,
     });
     handleClose();
     navigate('/resume/resumeForm');
@@ -26,7 +26,7 @@ function ResumeLandingPage() {
   return (
     <>
       <div className="gradient-bg h-screen w-screen flex flex-col lg:flex-row">
-       
+
         <div className="w-full lg:w-1/2 flex flex-col justify-center px-6 lg:pl-20 py-12 lg:py-0 relative z-10 gap-5 items-start">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 lg:mb-10 leading-tight">
             <span className="text-black dark:text-white">
@@ -45,9 +45,11 @@ function ResumeLandingPage() {
             />
           </div>
 
-          <p className="text-lg sm:text-xl mt-6 text-white/80 font-medium max-w-full lg:max-w-[500px] text-center lg:text-left">
-            Your story deserves a beautiful canvas. Let's paint it together.
-          </p>
+          <div>
+            <p className="text-lg sm:text-xl mt-6 text-white/80 font-medium max-w-full lg:max-w-[500px] text-center lg:text-left">
+              Your story deserves a beautiful canvas. Let's paint it together.
+            </p>
+          </div>
         </div>
 
         <div className="w-full lg:w-1/2 flex items-center justify-center relative z-10 pb-12 lg:pb-0">

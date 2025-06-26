@@ -19,11 +19,13 @@ import QuizPage from './quiz/QuizPage';
 import QuizStart from './quiz/QuizeStart';
 import ResumeLandingPage from './resumeBuilder/resumeLandingPage';
 import ResumeForm from './resumeBuilder/resumeForm';
+import useResumeStore from './stateManage/useResumeStore';
 
 function App() {
 
   const {authUser, setAuthUser} = useAuth();
   const {accessInterviewPage} = useConversation();
+  const {resumeData} = useResumeStore();
 
   useEffect(() => {
     const checkSession = async () => {
@@ -75,7 +77,7 @@ function App() {
             <Route path='/quiz' element={authUser? <QuizPage/> : <Navigate to="/login" replace />}/>
             <Route path='/quiz/start' element={authUser? <QuizStart/> : <Navigate to="/login" replace />}/>
             <Route path='/resume' element={authUser? <ResumeLandingPage/> : <Navigate to="/login" replace />}/>
-            <Route path='/resume/resumeForm' element={authUser? <ResumeForm/> : <Navigate to="/login" replace />}/>
+            <Route path='/resume/resumeForm' element={authUser && resumeData?.title ? <ResumeForm/> : <Navigate to="/resume" replace />}/>
           </Routes>
         </div>
 

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 const useResumeStore = create((set) => ({
   resumeData: {
     title: "",
