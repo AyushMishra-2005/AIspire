@@ -16,14 +16,18 @@ import TemplateOne from './resumeTemplates/templateOne.jsx';
 import html2canvas from 'html2canvas';
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js';
+import CertificationForm from './certificationForm.jsx';
+import InterestForm from './interestForm.jsx';
 
 const formSteps = [
   { component: <ProfileInfoForm />, label: 'Profile Info', progress: 0 },
-  { component: <ContactInfoForm />, label: 'Contact Info', progress: 20 },
-  { component: <WorkExperienceForm />, label: 'Work Experiencec', progress: 40 },
-  { component: <EducationForm />, label: 'Education', progress: 60 },
-  { component: <SkillInfoForm />, label: 'Skills', progress: 80 },
-  { component: <ProjectDetailsForm />, label: 'Projects', progress: 100 },
+  { component: <ContactInfoForm />, label: 'Contact Info', progress: 14.29 },
+  { component: <WorkExperienceForm />, label: 'Work Experiencec', progress: 14.29*2 },
+  { component: <EducationForm />, label: 'Education', progress: 14.29*3 },
+  { component: <SkillInfoForm />, label: 'Skills', progress: 14.29*4 },
+  { component: <CertificationForm />, label: 'Certifications', progress: 14.29*5 },
+  { component: <InterestForm />, label: 'Interests', progress: 14.29*6 },
+  { component: <ProjectDetailsForm />, label: 'Projects', progress: 14.29*7 },
 ];
 
 

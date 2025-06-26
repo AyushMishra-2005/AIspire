@@ -149,7 +149,7 @@ const TemplateOne = forwardRef((props, ref) => {
                     paddingRight: '8px'
                   }}
                 >
-                  {item}
+                  {item.name}
                   {i < interest.length - 1 && (
                     <span style={{
                       position: 'absolute',

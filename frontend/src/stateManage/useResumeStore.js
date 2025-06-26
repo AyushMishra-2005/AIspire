@@ -66,7 +66,11 @@ const useResumeStore = create((set) => ({
         progress: 0
       }
     ],
-    interest: [""]
+    interest: [
+      {
+        name : ""
+      }
+    ]
   },
 
   setResumeData: (resumeData) => set({ resumeData }),
