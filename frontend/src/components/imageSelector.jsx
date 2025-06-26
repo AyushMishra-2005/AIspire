@@ -22,8 +22,6 @@ function ImageSelector({onImageChange, setImageUrl}) {
     onImageChange?.(null)
   };
 
-  console.log(setImageUrl);
-
   return (
     <div className="relative w-30 h-30 mx-auto mt-6 z-10">
       <div className="w-full h-full rounded-full bg-white/5 border border-white/20 backdrop-blur-sm shadow-md flex items-center justify-center relative z-0">
