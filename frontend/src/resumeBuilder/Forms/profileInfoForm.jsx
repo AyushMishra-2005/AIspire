@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import ImageSelector from '../components/imageSelector';
-import useResumeStore from '../stateManage/useResumeStore';
+import ImageSelector from '../../components/imageSelector';
+import useResumeStore from '../../stateManage/useResumeStore';
 
 function ProfileInfoForm() {
 

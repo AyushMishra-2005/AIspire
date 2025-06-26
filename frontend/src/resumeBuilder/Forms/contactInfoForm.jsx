@@ -1,5 +1,5 @@
 import React from 'react'
-import useResumeStore from '../stateManage/useResumeStore';
+import useResumeStore from '../../stateManage/useResumeStore';
 
 function ContactInfoForm() {
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import useResumeStore from '../stateManage/useResumeStore.js'
+import useResumeStore from '../../stateManage/useResumeStore.js'
 
 function EducationForm() {
   const {

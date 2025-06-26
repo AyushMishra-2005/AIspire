@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import RatingInput from './ratingInput';
+import RatingInput from '../ratingInput.jsx';
 import { X } from 'lucide-react';
-import useResumeStore from '../stateManage/useResumeStore.js'
+import useResumeStore from '../../stateManage/useResumeStore.js'
 
 function SkillInfoForm() {
   const {

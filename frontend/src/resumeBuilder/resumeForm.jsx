@@ -4,20 +4,21 @@ import { Pen, Palette, Trash2, ArrowDownToLine, ArrowLeft, Save, ArrowRight } fr
 import StepProgress from './stepProgress';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import ProfileInfoForm from './profileInfoForm.jsx'
-import ContactInfoForm from './contactInfoForm.jsx'
-import WorkExperienceForm from './workExperienceForm.jsx'
-import EducationForm from './educationForm.jsx'
-import SkillInfoForm from './skillInfoForm.jsx'
-import ProjectDetailsForm from './projectDetailsForm.jsx';
+import ProfileInfoForm from './Forms/profileInfoForm.jsx'
+import ContactInfoForm from './Forms/contactInfoForm.jsx'
+import WorkExperienceForm from './Forms/workExperienceForm.jsx'
+import EducationForm from './Forms/educationForm.jsx'
+import SkillInfoForm from './Forms/skillInfoForm.jsx'
+import ProjectDetailsForm from './Forms/projectDetailsForm.jsx';
 import ResumeModal from './resumeModal.jsx';
 import useResumeStore from '../stateManage/useResumeStore.js';
 import TemplateOne from './resumeTemplates/templateOne.jsx';
 import html2canvas from 'html2canvas';
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js';
-import CertificationForm from './certificationForm.jsx';
-import InterestForm from './interestForm.jsx';
+import CertificationForm from './Forms/certificationForm.jsx';
+import InterestForm from './Forms/interestForm.jsx';
+import TemplateTwo from './resumeTemplates/templateTwo.jsx';
 
 const formSteps = [
   { component: <ProfileInfoForm />, label: 'Profile Info', progress: 0 },
@@ -98,7 +99,7 @@ function ResumeForm() {
   backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-10 
   flex items-center justify-between px-6 text-white text-lg font-medium mt-[50px]">
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-[10px]">
             <span className="text-white font-semibold text-xl">{resumeData?.title}</span>
             <Pen className="w-5 h-5 text-gray-300 hover:text-white cursor-pointer transition-colors"
               onClick={handleOpen}
@@ -158,7 +159,7 @@ function ResumeForm() {
 
                 <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/30 hover:bg-blue-500/50 text-sm transition-all duration-200 hover:scale-[1.03]">
                   <Save className="w-4 h-4 text-blue-100" />
-                  <span className="text-blue-200">Save & Exit</span>
+                  <span className="text-blue-200">Save</span>
                 </button>
 
                 <button
@@ -178,7 +179,7 @@ function ResumeForm() {
           {/* Right Container */}
           <div className="bg-white/5 backdrop-blur-md border border-white/10 w-full lg:w-1/2 h-[75vh] min-h-[500px] rounded-2xl shadow-2xl p-6 text-white z-10">
             <div className="overflow-y-auto h-full relative">
-              <TemplateOne ref={templateRef} />
+              <TemplateTwo ref={templateRef} />
             </div>
           </div>
         </div>
