@@ -4,24 +4,9 @@ import Lottie from 'lottie-react';
 import resumeAnim from '../assets/animations/resume.json';
 import { useNavigate } from 'react-router-dom';
 import ResumeModal from './resumeModal';
-import useResumeStore from '../stateManage/useResumeStore';
 
 function ResumeLandingPage() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const { resumeData, setResumeData } = useResumeStore();
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const handleSubmit = () => {
-    setResumeData({
-      ...resumeData,
-      title: title,
-    });
-    handleClose();
-    navigate('/resume/resumeForm');
-  };
 
   return (
     <>
@@ -54,7 +39,7 @@ function ResumeLandingPage() {
 
         <div className="w-full lg:w-1/2 flex items-center justify-center relative z-10 pb-12 lg:pb-0">
           <button
-            onClick={handleOpen}
+            onClick={() => navigate('/resume/selectResume')}
             className="jumping-button px-8 py-4 sm:px-10 sm:py-5 rounded-full text-lg sm:text-xl font-bold shadow-2xl group relative overflow-hidden"
           >
             <span className="relative z-10">Create Now</span>
@@ -62,14 +47,6 @@ function ResumeLandingPage() {
           </button>
         </div>
       </div>
-
-      <ResumeModal
-        open={open}
-        handleClose={handleClose}
-        title={title}
-        setTitle={setTitle}
-        handleSubmit={handleSubmit}
-      />
     </>
   );
 }

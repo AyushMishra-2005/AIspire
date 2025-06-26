@@ -20,6 +20,7 @@ import QuizStart from './quiz/QuizeStart';
 import ResumeLandingPage from './resumeBuilder/resumeLandingPage';
 import ResumeForm from './resumeBuilder/resumeForm';
 import useResumeStore from './stateManage/useResumeStore';
+import SelectResume from './resumeBuilder/selectResume';
 
 function App() {
 
@@ -77,7 +78,8 @@ function App() {
             <Route path='/quiz' element={authUser? <QuizPage/> : <Navigate to="/login" replace />}/>
             <Route path='/quiz/start' element={authUser? <QuizStart/> : <Navigate to="/login" replace />}/>
             <Route path='/resume' element={authUser? <ResumeLandingPage/> : <Navigate to="/login" replace />}/>
-            <Route path='/resume/resumeForm' element={authUser && resumeData?.title ? <ResumeForm/> : <Navigate to="/resume" replace />}/>
+            <Route path='/resume/selectResume' element={authUser? <SelectResume/> : <Navigate to="/resume" replace />}/>
+            <Route path='/resume/resumeForm' element={authUser && resumeData?.title ? <ResumeForm/> : <Navigate to="/resume/selectResume" replace />}/>
           </Routes>
         </div>
 
