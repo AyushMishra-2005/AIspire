@@ -21,8 +21,12 @@ function SkillInfoForm() {
     progress: 0
   }
 
-  const handleRatingChange = (index, newValue) => {
+  const handleRatingChangeSkill = (index, newValue) => {
     updateArrayItemField('skills', index, 'progress', newValue);
+  };
+
+  const handleRatingChangeLanguages = (index, newValue) => {
+    updateArrayItemField('languages', index, 'progress', newValue);
   };
 
 
@@ -76,7 +80,7 @@ function SkillInfoForm() {
               <div className="w-full h-12 flex items-center">
                 <RatingInput
                   value={skill.progress}
-                  onChange={(newValue) => handleRatingChange(index, newValue)}
+                  onChange={(newValue) => handleRatingChangeSkill(index, newValue)}
                 />
               </div>
             </div>
@@ -136,7 +140,7 @@ function SkillInfoForm() {
               <div className="w-full h-12 flex items-center">
                 <RatingInput
                   value={language.progress}
-                  onChange={(newValue) => handleRatingChange(index, newValue)}
+                  onChange={(newValue) => handleRatingChangeLanguages(index, newValue)}
                 />
               </div>
             </div>
