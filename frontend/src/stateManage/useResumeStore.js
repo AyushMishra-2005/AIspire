@@ -122,8 +122,10 @@ const useResumeStore = create((set) => ({
         }
       }
     });
-  }
+  },
 
+  selectedResumeId: '',
+  setSelectedResumeId : (selectedResumeId) => set({selectedResumeId}),
 
 }));
 

@@ -14,30 +14,31 @@ import useConversation from './stateManage/useConversation';
 import { useEffect } from 'react';
 import axios from 'axios'
 import server from './environment';
-import {Navigate} from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import QuizPage from './quiz/QuizPage';
 import QuizStart from './quiz/QuizeStart';
 import ResumeLandingPage from './resumeBuilder/resumeLandingPage';
 import ResumeForm from './resumeBuilder/resumeForm';
 import useResumeStore from './stateManage/useResumeStore';
 import SelectResume from './resumeBuilder/selectResume';
+import { ResumesProvider } from './context/getAllResume';
 
 function App() {
 
-  const {authUser, setAuthUser} = useAuth();
-  const {accessInterviewPage} = useConversation();
-  const {resumeData} = useResumeStore();
+  const { authUser, setAuthUser } = useAuth();
+  const { accessInterviewPage } = useConversation();
+  const { resumeData } = useResumeStore();
 
   useEffect(() => {
     const checkSession = async () => {
-      try{  
+      try {
         const res = await axios.get(
           `${server}/verify-token`,
-          {withCredentials : true}
+          { withCredentials: true }
         );
-      }catch(err){
+      } catch (err) {
         localStorage.removeItem('authUserData');
-        setAuthUser(null); 
+        setAuthUser(null);
       }
     }
     checkSession();
@@ -64,7 +65,7 @@ function App() {
           <Routes>
             <Route path='/' element={<HomeComponent />} />
             <Route path='/interviewPage' element={authUser && accessInterviewPage ? <InterviewPage /> : <HomeComponent />} />
-            <Route path='/signup' element={authUser ? <HomeComponent />  : <SignupForm />} />
+            <Route path='/signup' element={authUser ? <HomeComponent /> : <SignupForm />} />
             <Route path='/login' element={authUser ? <HomeComponent /> : <Login />} />
             <Route path="*" element={
               <>
@@ -73,13 +74,24 @@ function App() {
                 </div>
               </>
             } />
-            <Route path='/logout' element={authUser? <Logout/> : <HomeComponent />}/>
-            <Route path='/interviewForm' element={authUser? <InterviewForm/> : <Navigate to="/login" replace />}/>
-            <Route path='/quiz' element={authUser? <QuizPage/> : <Navigate to="/login" replace />}/>
-            <Route path='/quiz/start' element={authUser? <QuizStart/> : <Navigate to="/login" replace />}/>
-            <Route path='/resume' element={authUser? <ResumeLandingPage/> : <Navigate to="/login" replace />}/>
-            <Route path='/resume/selectResume' element={authUser? <SelectResume/> : <Navigate to="/resume" replace />}/>
-            <Route path='/resume/resumeForm' element={authUser && resumeData?.title ? <ResumeForm/> : <Navigate to="/resume/selectResume" replace />}/>
+            <Route path='/logout' element={authUser ? <Logout /> : <HomeComponent />} />
+            <Route path='/interviewForm' element={authUser ? <InterviewForm /> : <Navigate to="/login" replace />} />
+            <Route path='/quiz' element={authUser ? <QuizPage /> : <Navigate to="/login" replace />} />
+            <Route path='/quiz/start' element={authUser ? <QuizStart /> : <Navigate to="/login" replace />} />
+            <Route path='/resume' element={authUser ? <ResumeLandingPage /> : <Navigate to="/login" replace />} />
+            <Route
+              path='/resume/selectResume'
+              element={
+                authUser ? (
+                  <ResumesProvider>
+                    <SelectResume />
+                  </ResumesProvider>
+                ) : (
+                  <Navigate to="/resume" replace />
+                )
+              }
+            />
+            <Route path='/resume/resumeForm' element={authUser && resumeData?.title ? <ResumeForm /> : <Navigate to="/resume/selectResume" replace />} />
           </Routes>
         </div>
 

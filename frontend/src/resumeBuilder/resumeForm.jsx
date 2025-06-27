@@ -18,6 +18,10 @@ import html2pdf from 'html2pdf.js';
 import CertificationForm from './Forms/certificationForm.jsx';
 import InterestForm from './Forms/interestForm.jsx';
 import ResumeTemplateModal from './resumeTemplateModal.jsx';
+import axios from 'axios';
+import server from '../environment.js'
+import { toast } from 'react-hot-toast'
+import { Loader2 } from 'lucide-react';
 
 import TemplateOne from './resumeTemplates/templateOne.jsx';
 import TemplateTwo from './resumeTemplates/templateTwo.jsx';
@@ -41,8 +45,12 @@ function ResumeForm() {
   const [direction, setDirection] = useState(1);
   const [currentStep, setCurrentStep] = useState(0);
   const stepProgress = ((currentStep + 1) / formSteps.length) * 100;
-  const { resumeData, setResumeData } = useResumeStore();
+  const { resumeData, setResumeData, selectedResumeId } = useResumeStore();
+  const [loading, setLoading] = useState(false);
+
   const templateRef = useRef();
+
+
 
   const templateData = [
     { component: <TemplateOne ref={templateRef} /> },
@@ -114,6 +122,31 @@ function ResumeForm() {
   };
 
 
+  const handleSave = async () => {
+    if (!selectedResumeId) return;
+
+    const resumeDetails = resumeData;
+    const id = selectedResumeId;
+
+    setLoading(true);
+
+    try {
+      const { data } = await axios.post(
+        `${server}/resume/edit-resume`,
+        { resumeDetails, id },
+        { withCredentials: true }
+      );
+
+      toast.success("Resume Updated");
+    } catch (err) {
+      console.log(err);
+      toast.error("Error Occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   return (
     <>
@@ -122,7 +155,7 @@ function ResumeForm() {
   backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-10 
   flex items-center justify-between px-6 text-white text-lg font-medium mt-[50px]">
 
-          <div className="flex items-center gap-[10px]">
+          <div className="flex items-center gap-[10px] mr-[20px]">
             <span className="text-white font-semibold text-xl">{resumeData?.title}</span>
             <Pen className="w-5 h-5 text-gray-300 hover:text-white cursor-pointer transition-colors"
               onClick={handleOpen}
@@ -130,11 +163,27 @@ function ResumeForm() {
           </div>
 
           <div className="flex items-center gap-4">
+
+            <button
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/30 hover:bg-blue-500/50 text-sm transition-all duration-200 hover:scale-[1.03]"
+              onClick={handleSave}
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="animate-spin w-4 h-4 text-blue-100" />
+              ) : (
+                <>
+                  <Save className="w-4 h-4 text-blue-100" />
+                  <span className="hidden md:block">Save</span>
+                </>
+              )}
+            </button>
+
             <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm transition-all duration-200"
               onClick={handleTemplateOpen}
             >
               <Palette className="w-5 h-5 text-white" />
-              <span className="hidden md:block">Change Theme</span>
+              <span className="hidden md:block">Theme</span>
             </button>
 
             <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-sm transition-all duration-200">
@@ -180,11 +229,6 @@ function ResumeForm() {
                 >
                   <ArrowLeft className="w-4 h-4 text-white" />
                   <span className="text-white">Back</span>
-                </button>
-
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/30 hover:bg-blue-500/50 text-sm transition-all duration-200 hover:scale-[1.03]">
-                  <Save className="w-4 h-4 text-blue-100" />
-                  <span className="text-blue-200">Save</span>
                 </button>
 
                 <button
