@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import './resume.css';
 import { Pen, Palette, Trash2, ArrowDownToLine, ArrowLeft, Save, ArrowRight } from "lucide-react";
 import StepProgress from './stepProgress';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, number } from 'framer-motion';
 
 import ProfileInfoForm from './Forms/profileInfoForm.jsx'
 import ContactInfoForm from './Forms/contactInfoForm.jsx'
@@ -12,24 +12,28 @@ import SkillInfoForm from './Forms/skillInfoForm.jsx'
 import ProjectDetailsForm from './Forms/projectDetailsForm.jsx';
 import ResumeModal from './resumeModal.jsx';
 import useResumeStore from '../stateManage/useResumeStore.js';
-import TemplateOne from './resumeTemplates/templateOne.jsx';
 import html2canvas from 'html2canvas';
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js';
 import CertificationForm from './Forms/certificationForm.jsx';
 import InterestForm from './Forms/interestForm.jsx';
+import ResumeTemplateModal from './resumeTemplateModal.jsx';
+
+import TemplateOne from './resumeTemplates/templateOne.jsx';
 import TemplateTwo from './resumeTemplates/templateTwo.jsx';
+
 
 const formSteps = [
   { component: <ProfileInfoForm />, label: 'Profile Info', progress: 0 },
   { component: <ContactInfoForm />, label: 'Contact Info', progress: 14.29 },
-  { component: <WorkExperienceForm />, label: 'Work Experiencec', progress: 14.29*2 },
-  { component: <EducationForm />, label: 'Education', progress: 14.29*3 },
-  { component: <SkillInfoForm />, label: 'Skills', progress: 14.29*4 },
-  { component: <CertificationForm />, label: 'Certifications', progress: 14.29*5 },
-  { component: <InterestForm />, label: 'Interests', progress: 14.29*6 },
-  { component: <ProjectDetailsForm />, label: 'Projects', progress: 14.29*7 },
+  { component: <WorkExperienceForm />, label: 'Work Experiencec', progress: 14.29 * 2 },
+  { component: <EducationForm />, label: 'Education', progress: 14.29 * 3 },
+  { component: <SkillInfoForm />, label: 'Skills', progress: 14.29 * 4 },
+  { component: <CertificationForm />, label: 'Certifications', progress: 14.29 * 5 },
+  { component: <InterestForm />, label: 'Interests', progress: 14.29 * 6 },
+  { component: <ProjectDetailsForm />, label: 'Projects', progress: 14.29 * 7 },
 ];
+
 
 
 function ResumeForm() {
@@ -40,16 +44,35 @@ function ResumeForm() {
   const { resumeData, setResumeData } = useResumeStore();
   const templateRef = useRef();
 
-  const [open, setOpen] = useState(false);
+  const templateData = [
+    { component: <TemplateOne ref={templateRef} /> },
+    { component: <TemplateTwo ref={templateRef} /> }
+  ];
+
+  const [titleOpen, setTitleOpen] = useState(false);
   const [title, setTitle] = useState('');
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => setTitleOpen(true);
+  const handleClose = () => setTitleOpen(false);
   const handleSubmit = () => {
     setResumeData({
       ...resumeData,
       title: title,
     });
     handleClose();
+  }
+
+  const [templateOpen, setTemplateOpen] = useState(false);
+  const [template, setTemplate] = useState('');
+  const handleTemplateOpen = () => setTemplateOpen(true);
+  const handleTemplateClose = () => setTemplateOpen(false);
+  const handleTemplateSubmit = (index) => {
+    setResumeData({
+      ...resumeData,
+      template: {
+        ...resumeData.template,
+        number: index
+      }
+    });
   }
 
   const handleNext = () => {
@@ -66,7 +89,7 @@ function ResumeForm() {
     }
   }
 
- 
+
   const handleDownloadPDF = () => {
     const element = templateRef.current;
     const opt = {
@@ -84,7 +107,7 @@ function ResumeForm() {
         format: 'a4',
         orientation: 'portrait',
       },
-      
+
     };
 
     html2pdf().set(opt).from(element).toPdf().get('pdf').save();
@@ -107,7 +130,9 @@ function ResumeForm() {
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm transition-all duration-200">
+            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm transition-all duration-200"
+              onClick={handleTemplateOpen}
+            >
               <Palette className="w-5 h-5 text-white" />
               <span className="hidden md:block">Change Theme</span>
             </button>
@@ -179,18 +204,25 @@ function ResumeForm() {
           {/* Right Container */}
           <div className="bg-white/5 backdrop-blur-md border border-white/10 w-full lg:w-1/2 h-[75vh] min-h-[500px] rounded-2xl shadow-2xl p-6 text-white z-10">
             <div className="overflow-y-auto h-full relative">
-              <TemplateTwo ref={templateRef} />
+              {templateData[resumeData.template.number].component}
             </div>
           </div>
         </div>
       </div>
 
       <ResumeModal
-        open={open}
+        open={titleOpen}
         handleClose={handleClose}
         title={title}
         setTitle={setTitle}
         handleSubmit={handleSubmit}
+      />
+
+      <ResumeTemplateModal
+        open={templateOpen}
+        handleClose={handleTemplateClose}
+        setTemplate={setTemplate}
+        handleSubmit={handleTemplateSubmit}
       />
 
     </>

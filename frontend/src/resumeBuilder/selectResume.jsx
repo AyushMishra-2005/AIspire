@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import './resume.css';
-import resumeImage from '../assets/resumeImage.png'
+import resumeImage from '../assets/resumeImage2.png'
 import ResumeModal from './resumeModal';
 import { useNavigate } from 'react-router-dom';
 import useResumeStore from '../stateManage/useResumeStore';

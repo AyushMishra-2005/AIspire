@@ -12,8 +12,7 @@ const useResumeStore = create((set) => ({
       summary: ""
     },
     template: {
-      theme: "",
-      colorPalette: ""
+      number:0
     },
     contactInfo: {
       email: "",
