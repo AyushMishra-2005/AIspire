@@ -5,8 +5,8 @@ const useResumeStore = create((set) => ({
     title: "",
     thumbnailLink: "",
     profileInfo: {
-      profileImg: null,
       profilePreviewUrl: "",
+      profilePublicId : "",
       fullName: "",
       designation: "",
       summary: ""
@@ -126,6 +126,9 @@ const useResumeStore = create((set) => ({
 
   selectedResumeId: '',
   setSelectedResumeId : (selectedResumeId) => set({selectedResumeId}),
+
+  selectedImageFile: {},
+  setSelectedImageFile : (selectedImageFile) => set({selectedImageFile}),
 
 }));
 

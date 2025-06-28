@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Upload, Trash2, User } from 'lucide-react';
+import useResumeStore from '../stateManage/useResumeStore';
 
-function ImageSelector({onImageChange, setImageUrl}) {
+function ImageSelector({onImageChange, setImageUrl, onImageRemove}) {
   const [image, setImage] = useState(setImageUrl || null);
+  const {setSelectedImageFile} = useResumeStore();
 
   useEffect(() => {
     setImage(setImageUrl);
@@ -14,12 +16,15 @@ function ImageSelector({onImageChange, setImageUrl}) {
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
       onImageChange?.(imageUrl)
+      setSelectedImageFile(file);
     }
   };
 
   const handleRemove = () => {
     setImage(null);
-    onImageChange?.(null)
+    onImageChange?.(null);
+    setSelectedImageFile(null);
+    onImageRemove?.();
   };
 
   return (

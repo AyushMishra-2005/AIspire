@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 import { Schema } from "mongoose";
 
 const resumeContentSchema = new Schema({
-  title: String,
-  thumbnailLink: String,
+  title: { type: String, default: "" },
+  thumbnailLink: { type: String, default: "" },
   profileInfo: {
-    profileImg: String,
-    profilePreviewUrl: String,
-    fullName: String,
-    designation: String,
-    summary: String,
+    profilePreviewUrl: { type: String, default: "" },
+    profilePublicId: { type: String, default: "" },
+    fullName: { type: String, default: "" },
+    designation: { type: String, default: "" },
+    summary: { type: String, default: "" },
   },
   template: {
     number: {
@@ -18,55 +18,50 @@ const resumeContentSchema = new Schema({
     },
   },
   contactInfo: {
-    email: String,
-    phone: String,
-    location: String,
-    linkedin: String,
-    github: String,
-    website: String,
+    email: { type: String, default: "" },
+    phone: { type: String, default: "" },
+    location: { type: String, default: "" },
+    linkedin: { type: String, default: "" },
+    github: { type: String, default: "" },
+    website: { type: String, default: "" },
   },
   workExperience: [{
-    company: String,
-    role: String,
-    startDate: String,
-    endDate: String,
-    description: String,
+    company: { type: String, default: "" },
+    role: { type: String, default: "" },
+    startDate: { type: String, default: "" },
+    endDate: { type: String, default: "" },
+    description: { type: String, default: "" },
   }],
   education: [{
-    degree: String,
-    institution: String,
-    startDate: String,
-    endDate: String,
+    degree: { type: String, default: "" },
+    institution: { type: String, default: "" },
+    startDate: { type: String, default: "" },
+    endDate: { type: String, default: "" },
   }],
   skills: [{
-    name: String,
-    progress: {
-      type : Number,
-      default : 0
-    },
+    name: { type: String, default: "" },
+    progress: { type: Number, default: 0 },
   }],
   projects: [{
-    title: String,
-    description: String,
-    github: String,
-    liveDemo: String,
+    title: { type: String, default: "" },
+    description: { type: String, default: "" },
+    github: { type: String, default: "" },
+    liveDemo: { type: String, default: "" },
   }],
   certifications: [{
-    title: String,
-    issuer: String,
-    year: String,
+    title: { type: String, default: "" },
+    issuer: { type: String, default: "" },
+    year: { type: String, default: "" },
   }],
   languages: [{
-    name: String,
-    progress: {
-      type : Number,
-      default : 0
-    },
+    name: { type: String, default: "" },
+    progress: { type: Number, default: 0 },
   }],
   interest: [{
-    name: String,
+    name: { type: String, default: "" },
   }]
-}, { _id: false }); 
+}, { _id: false });
+
 
 const resumeDetailsSchema = new Schema({
   resumeDetails: resumeContentSchema,

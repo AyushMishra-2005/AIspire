@@ -45,12 +45,10 @@ function ResumeForm() {
   const [direction, setDirection] = useState(1);
   const [currentStep, setCurrentStep] = useState(0);
   const stepProgress = ((currentStep + 1) / formSteps.length) * 100;
-  const { resumeData, setResumeData, selectedResumeId } = useResumeStore();
+  const { resumeData, setResumeData, updateResumeField, selectedResumeId, selectedImageFile, setSelectedImageFile } = useResumeStore();
   const [loading, setLoading] = useState(false);
 
   const templateRef = useRef();
-
-
 
   const templateData = [
     { component: <TemplateOne ref={templateRef} /> },
@@ -125,17 +123,45 @@ function ResumeForm() {
   const handleSave = async () => {
     if (!selectedResumeId) return;
 
-    const resumeDetails = resumeData;
-    const id = selectedResumeId;
-
     setLoading(true);
 
     try {
+      if(selectedImageFile){
+        const { data } = await axios.get(
+          `${server}/getImage`,
+          {},
+          { withCredentials: true }
+        );
+
+        const imageFormData = new FormData();
+        imageFormData.append("file", selectedImageFile);
+        imageFormData.append('api_key', data.apiKey);
+        imageFormData.append('timestamp', data.timestamp);
+        imageFormData.append('signature', data.signature);
+
+        const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${data.cloudName}/image/upload`;
+
+        const uploadRes = await axios.post(cloudinaryUrl, imageFormData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        const imageURL = uploadRes.data.secure_url;
+        const publicId = uploadRes.data.public_id;
+
+        updateResumeField('profileInfo', 'profilePreviewUrl', imageURL);
+        updateResumeField('profileInfo', 'profilePublicId', publicId);
+      }
+
+      const resumeDetails = useResumeStore.getState().resumeData;
+      const id = selectedResumeId;
+
       const { data } = await axios.post(
         `${server}/resume/edit-resume`,
         { resumeDetails, id },
         { withCredentials: true }
       );
+
+      setSelectedImageFile(null);
 
       toast.success("Resume Updated");
     } catch (err) {

@@ -27,12 +27,11 @@ function SelectResume() {
 
   const handleAddClick = async () => {
     const resumeTitle = title;
-    const resumeDetails = resumeData;
-
+    
     try {
       const { data } = await axios.post(
         `${server}/resume/create-resume`,
-        { resumeTitle, resumeDetails },
+        { resumeTitle },
         { withCredentials: true }
       );
 
@@ -40,7 +39,7 @@ function SelectResume() {
         return;
       }
 
-      console.log(data.savedResumeDetails);
+      setResumeData(data.savedResumeDetails);
     } catch (err) {
       console.log(err);
     }
@@ -108,6 +107,7 @@ function SelectResume() {
                       onClick={() => {
                         setResumeData(resume.resumeDetails);
                         setSelectedResumeId(resume._id);
+                        console.log(resume._id)
                         navigate('/resume/resumeForm');
                       }}
                     >

@@ -69,6 +69,18 @@ app.get("/getImage", (req, res) => {
   });
 });
 
+app.post('/deleteImage', async (req, res) => {
+  const { publicId } = req.body;
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      invalidate: true,
+    });
+    res.status(200).json({result});
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.listen(port, () => {
   console.log("app is running at port 8000");

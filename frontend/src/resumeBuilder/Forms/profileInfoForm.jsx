@@ -1,15 +1,53 @@
 import React, { useState } from 'react'
 import ImageSelector from '../../components/imageSelector';
 import useResumeStore from '../../stateManage/useResumeStore';
+import server from '../../environment';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 function ProfileInfoForm() {
 
   const [imageUrl, setImageUrl] = useState();
-  const {resumeData, setResumeData, updateResumeField} = useResumeStore();
+  const { resumeData, setResumeData, updateResumeField, selectedResumeId } = useResumeStore();
 
   const handleProfileImageChange = (imageUrl) => {
     setImageUrl(imageUrl);
     updateResumeField('profileInfo', 'profilePreviewUrl', imageUrl);
+  }
+
+  const handleImageRemove = async () => {
+
+    const publicId = resumeData.profileInfo.profilePublicId;
+
+    if (publicId) {
+      try {
+        const { data } = await axios.post(
+          `${server}/deleteImage`,
+          { publicId },
+          { withCredentials: true }
+        );
+
+        if (data.result) {
+          updateResumeField('profileInfo', 'profilePreviewUrl', "");
+          updateResumeField('profileInfo', 'profilePublicId', "");
+
+          const resumeDetails = useResumeStore.getState().resumeData;;
+          const id = selectedResumeId;
+
+          await axios.post(
+            `${server}/resume/edit-resume`,
+            { resumeDetails, id },
+            { withCredentials: true }
+          );
+
+          console.log(resumeData);
+
+          toast.success("Image Deleted");
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
   }
 
   return (
@@ -19,8 +57,12 @@ function ProfileInfoForm() {
         Personal Information
       </h2>
 
-      <ImageSelector onImageChange={handleProfileImageChange} setImageUrl={resumeData.profileInfo.profilePreviewUrl}/>
-      
+      <ImageSelector
+        onImageChange={handleProfileImageChange}
+        setImageUrl={resumeData.profileInfo.profilePreviewUrl}
+        onImageRemove={() => handleImageRemove()}
+      />
+
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">
@@ -39,7 +81,7 @@ function ProfileInfoForm() {
             value={resumeData.profileInfo?.fullName}
           />
         </div>
-        
+
         <div className="flex-1">
           <label htmlFor="designation" className="block text-sm font-medium text-gray-300 mb-1">
             Designation
@@ -58,7 +100,7 @@ function ProfileInfoForm() {
           />
         </div>
       </div>
-      
+
       <div>
         <label htmlFor="summary" className="block text-sm font-medium text-gray-300 mb-1">
           Summary
