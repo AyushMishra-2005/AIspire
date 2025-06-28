@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './resume.css';
-import resumeImage from '../assets/resumeImage2.png'
 import ResumeModal from './resumeModal';
 import { useNavigate } from 'react-router-dom';
 import useResumeStore from '../stateManage/useResumeStore';
@@ -8,6 +7,11 @@ import axios from 'axios'
 import server from '../environment.js'
 import { useGetAllResumes } from '../context/getAllResume.jsx';
 import { formatDistanceToNow } from 'date-fns';
+
+import image1 from '../assets/resumeImage1.png'
+import image2 from '../assets/resumeImage2.png'
+
+const images = [image1, image2]
 
 function SelectResume() {
 
@@ -95,7 +99,7 @@ function SelectResume() {
               >
                 <div className="relative pt-[60%] bg-gradient-to-br from-gray-700 to-gray-900">
                   <img
-                    src={resumeImage}
+                    src={images[resume.resumeDetails.template.number]}
                     alt={`Resume ${resume._id}`}
                     className="absolute top-0 left-0 w-full h-full object-contain"
                   />
