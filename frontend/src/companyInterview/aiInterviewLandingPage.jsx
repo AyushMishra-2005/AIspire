@@ -1,9 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
-import aiAnimation from "../assets/animations/aiInterview.json"; // Make sure this path is correct
+import aiAnimation from "../assets/animations/aiInterview.json"; 
+import {useNavigate} from 'react-router-dom'
 
 export function AiInterviewLandingPage() {
+
+  const navigate = useNavigate();
+
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white flex flex-col items-center justify-center px-4">
 
@@ -59,10 +63,18 @@ export function AiInterviewLandingPage() {
         transition={{ delay: 0.8, duration: 0.6 }}
         className="mt-10 flex justify-center gap-6"
       >
-        <button className="px-6 py-3 bg-indigo-600 text-white rounded-2xl shadow-md hover:bg-indigo-700 transition duration-300 cursor-pointer">
+        <button className="px-6 py-3 bg-indigo-600 text-white rounded-2xl shadow-md hover:bg-indigo-700 transition duration-300 cursor-pointer"
+          onClick={() => {
+            navigate('/aiInterviews/createInterview')
+          }}
+        >
           Create Interview
         </button>
-        <button className="px-6 py-3 bg-purple-500 text-white rounded-2xl shadow-md hover:bg-purple-600 transition duration-300 cursor-pointer">
+        <button className="px-6 py-3 bg-purple-500 text-white rounded-2xl shadow-md hover:bg-purple-600 transition duration-300 cursor-pointer"
+          onClick={() => {
+            navigate('/aiInterviews/attendInterview')
+          }}
+        >
           Attend Interview
         </button>
       </motion.div>

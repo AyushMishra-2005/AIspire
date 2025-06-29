@@ -48,7 +48,7 @@ const interviews = [
   },
 ];
 
-function InterviewLandingPage() {
+function AttendInterviews() {
   const placeholders = [
     "What's the first rule of Fight Club?",
     "Who is Tyler Durden?",
@@ -128,4 +128,4 @@ function InterviewLandingPage() {
   );
 }
 
-export default InterviewLandingPage;
+export default AttendInterviews;

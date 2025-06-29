@@ -22,8 +22,10 @@ import ResumeForm from './resumeBuilder/resumeForm';
 import useResumeStore from './stateManage/useResumeStore';
 import SelectResume from './resumeBuilder/selectResume';
 import { ResumesProvider } from './context/getAllResume';
-import InterviewLandingPage from './companyInterview/interviewLandingPage';
+import AttendInterviews from './companyInterview/attendInterviewsPage';
 import { AiInterviewLandingPage } from './companyInterview/aiInterviewLandingPage';
+import CreateInterviewPage from './companyInterview/createInterviewPage';
+import {AttandantPage} from './companyInterview/attandantPage';
 
 function App() {
 
@@ -95,6 +97,11 @@ function App() {
             />
             <Route path='/resume/resumeForm' element={authUser && resumeData?.title ? <ResumeForm /> : <Navigate to="/resume/selectResume" replace />} />
             <Route path='/aiInterviews' element={authUser? <AiInterviewLandingPage /> : <Navigate to="/" replace />} />
+            <Route path='/aiInterviews/attendInterview' element={authUser? <AttendInterviews /> : <Navigate to="/" replace />} />
+
+            <Route path='/aiInterviews/createInterview' element={authUser? <CreateInterviewPage /> : <Navigate to="/" replace />} />
+            
+            <Route path='/aiInterviews/createInterview/attandants' element={authUser? <AttandantPage /> : <Navigate to="/" replace />} />
           </Routes>
         </div>
 
