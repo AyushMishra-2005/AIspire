@@ -119,14 +119,14 @@ function ResumeForm() {
     html2pdf().set(opt).from(element).toPdf().get('pdf').save();
   };
 
-
   const handleSave = async () => {
     if (!selectedResumeId) return;
 
     setLoading(true);
 
     try {
-      if(selectedImageFile){
+      if(selectedImageFile && selectedImageFile.name && selectedImageFile.size > 0){
+
         const { data } = await axios.get(
           `${server}/getImage`,
           {},
