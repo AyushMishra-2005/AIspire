@@ -7,7 +7,6 @@ export const createResume = async (req, res) => {
 
   const email = req.user.email;
   const fullName = req.user.name;
-  const profilePreviewUrl = req.user.profilePicURL || "";
 
   if (!email || !resumeTitle || !fullName) {
     return res.status(501).json({ message: "Invalid Data" });
@@ -20,7 +19,7 @@ export const createResume = async (req, res) => {
         title: resumeTitle,
         thumbnailLink: "",
         profileInfo: {
-          profilePreviewUrl: profilePreviewUrl || "",
+          profilePreviewUrl: "",
           profilePublicId: "",
           fullName: fullName || "",
           designation: "",

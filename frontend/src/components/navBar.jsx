@@ -24,6 +24,7 @@ export function NavbarDemo() {
 
   const navItems = [
     { name: "Home", link: "/" },
+    { name: "AI Interviews", link: "/aiInterviews" },
     { name: "Contact", link: "/" },
   ];
 

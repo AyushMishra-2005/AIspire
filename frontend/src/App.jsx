@@ -22,6 +22,8 @@ import ResumeForm from './resumeBuilder/resumeForm';
 import useResumeStore from './stateManage/useResumeStore';
 import SelectResume from './resumeBuilder/selectResume';
 import { ResumesProvider } from './context/getAllResume';
+import InterviewLandingPage from './companyInterview/interviewLandingPage';
+import { AiInterviewLandingPage } from './companyInterview/aiInterviewLandingPage';
 
 function App() {
 
@@ -92,6 +94,7 @@ function App() {
               }
             />
             <Route path='/resume/resumeForm' element={authUser && resumeData?.title ? <ResumeForm /> : <Navigate to="/resume/selectResume" replace />} />
+            <Route path='/aiInterviews' element={authUser? <AiInterviewLandingPage /> : <Navigate to="/" replace />} />
           </Routes>
         </div>
 
