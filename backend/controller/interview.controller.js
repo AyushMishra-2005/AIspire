@@ -264,7 +264,11 @@ Constraints:
 2. Each question must be clear, focused, and easily answerable within a 30–60 second spoken response.
 3. All questions must be different in wording and focus — avoid redundancy.
 4. Avoid overly technical or essay-style questions unless essential to the role.
-5. For each question, estimate the expected time (in seconds) a candidate would take to answer it orally. The time should be between 30 and 60 seconds and should be appropriate for the question’s complexity and depth.
+5. For each question, estimate the expected time (in seconds) a candidate would take to answer it orally. Use the following scale:
+    - Simple factual questions: 30–35 seconds.
+    - Conceptual or reasoning-based questions: 40–50 seconds.
+    - Scenario-based, open-ended, or multi-step questions: 50–60 seconds.
+  Ensure a natural variation across the question list, based on complexity.
 
 Return your response strictly in the following JSON format:
 
