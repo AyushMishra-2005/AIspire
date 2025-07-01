@@ -10,7 +10,18 @@ const interviewSchema = new Schema(
       lowercase: true,
     },
     questions: {
-      type: [String],
+      type: [
+        {
+          question: {
+            type: String,
+            required: true
+          },
+          time: {
+            type: Number,
+            required: true
+          }
+        },
+      ],
       required: true,
     },
     answers: {

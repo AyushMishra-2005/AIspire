@@ -14,7 +14,7 @@ export const checkRoleAndTopicQuiz = async (req, res) => {
   }
 
   try {
-     const prompt = `
+    const prompt = `
       You are an expert AI interview assistant.
 
       Your task:
@@ -70,12 +70,12 @@ export const checkRoleAndTopicQuiz = async (req, res) => {
         stream: false,
         format: "json",
         options: {
-          temperature: 0.8,        
-          presence_penalty: 0.6,   
-          frequency_penalty: 0.6  
+          temperature: 0.8,
+          presence_penalty: 0.6,
+          frequency_penalty: 0.6
         }
       }
-    ); 
+    );
 
     let rawdata = aiResponse.data.response;
 
@@ -92,11 +92,16 @@ export const checkRoleAndTopicQuiz = async (req, res) => {
 
     let { valid, questions } = response;
 
+    questions = questions.map(q => ({
+      ...q,
+      time: q.time ?? 50
+    }));
+
     if (valid) {
       try {
 
         questions = questions.slice(0, numOfQns);
-        
+
         console.log(questions);
         return res.status(200).json({ message: "Questions generated", response, questions });
       } catch (err) {

@@ -9,6 +9,7 @@ import TextToVoice from "../components/textToVoice.jsx";
 import { useAuth } from "../context/AuthProvider.jsx";
 import server from '../environment.js'
 import { useNavigate } from 'react-router-dom'
+import CountdownTimer from "../components/countDownTimer.jsx";
 
 function InterviewPage() {
   const [spokenText, setSpokenText] = useState("");
@@ -72,8 +73,7 @@ function InterviewPage() {
       const name = authUser.user.name;
       const previousQuestions = askedQuestions;
       const askedQuestion = assistantContent;
-      const givenAnswer = candidateAnswer;
-      console.log(previousQuestions);
+      const givenAnswer = candidateAnswer?.trim() === "" ? "Answer Not Provided." : candidateAnswer;
 
       const { data } = await axios.post(`${server}/interview/generate-question`,
         { role, topic, name, previousQuestions, askedQuestion, givenAnswer, numOfQns },
@@ -140,6 +140,15 @@ function InterviewPage() {
       />
 
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-gray-950"></div>
+      
+      {startInterview && userMic && !aiSpeaking && (
+        <div className="absolute top-6 right-6 z-50">
+          <CountdownTimer duration={askedQuestions[askedQuestions.length-1]?.time} onComplete={() => {
+            console.log("Time's up");
+            handleSendRecording();
+          }} />
+        </div>
+      )}
       <div className="h-[100%] w-[100%] min-h-[100vh] min-w-[100vw] z-20 flex justify-evenly items-center flex-col">
         <div className="h-[80%] w-[100%] flex flex-row justify-evenly">
           <AssistantPage />
@@ -212,13 +221,10 @@ function InterviewPage() {
               </button>
             }
 
-
-
             <VoiceConvertor
               onTranscriptUpdate={setTranscript}
               onControlsReady={setControls}
             />
-
           </div>
         </div>
       </div>

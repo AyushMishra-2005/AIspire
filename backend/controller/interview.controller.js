@@ -2,7 +2,8 @@ import axios from 'axios';
 import InterviewData from '../models/interview.model.js';
 
 export const generateQuestions = async (req, res) => {
-  const { role, topic, name, previousQuestions = [], askedQuestion, givenAnswer, numOfQns } = req.body;
+  const { role, topic, name, previousQuestions = [], askedQuestion, numOfQns } = req.body;
+  let {givenAnswer} = req.body;
   const { email } = req.user;
 
   if (!role || !topic || !name) {
@@ -16,6 +17,8 @@ export const generateQuestions = async (req, res) => {
       received: { askedQuestion, givenAnswer }
     });
   }
+
+  givenAnswer = givenAnswer?.trim() === "" ? "Answer Not Provided." : givenAnswer;
 
   try {
     let prompt;
@@ -85,7 +88,7 @@ export const generateQuestions = async (req, res) => {
         transitionData += ",";
       }
 
-      let responseData = addressing + " " + transitionData + " " + question;
+      let responseData = addressing + " " + transitionData + " " + question.question;
 
       return res.status(200).json({ message: "Question generated!", question, responseData, finishInterview });
 
@@ -96,7 +99,7 @@ export const generateQuestions = async (req, res) => {
         prompt = `You are conducting a professional interview for ${role} focusing on ${topic}.
 
         Previous Question: "${askedQuestion}"
-        Candidate Answer: "${givenAnswer}"
+        Candidate Answer: "${(givenAnswer || '').trim() || '[No answer provided]'}"
 
         Generate:
 
@@ -104,7 +107,14 @@ export const generateQuestions = async (req, res) => {
           - Exactly 2 professional sentences
           - Use "you/your" to address the candidate directly
           - Only assess the answer — no suggestions, tips, or ratings
-          - Example: "Your explanation covered X well. You might clarify Y."
+          - The tone must be objective and professional — avoid encouraging or consoling language
+          - Only assess the answer — do not offer suggestions, praise, tips, or requests to try again
+          - If the answer is incorrect, missing, or incomplete, state that directly and factually
+          - Do not ask the candidate to answer the question again while giving feedback
+          - If no answer was given, indicate that clearly and professionally
+          - Example (if no answer): "You did not provide a response to the question. This may reflect a gap in your understanding of the topic."
+          - Example: (normal): "Your explanation covered X well. You might clarify Y."
+
 
         2. END MESSAGE (STRICT RULES):
           - Generate a professional, warm, and slightly longer thank-you message (2–3 sentences)
@@ -127,7 +137,7 @@ export const generateQuestions = async (req, res) => {
         prompt = `You are conducting a professional interview for ${role} focusing on ${topic}.
 
         Previous Question: "${askedQuestion}"
-        Candidate Answer: "${givenAnswer}"
+        Candidate Answer: "${(givenAnswer || '').trim() || '[No answer provided]'}"
 
         Generate:
 
@@ -135,7 +145,13 @@ export const generateQuestions = async (req, res) => {
           - Exactly 2 professional sentences
           - Use "you/your" to address the candidate directly
           - Only assess the answer — no suggestions, tips, or ratings
-          - Example: "Your explanation covered X well. You might clarify Y."
+          - The tone must be objective and professional — avoid encouraging or consoling language
+          - Only assess the answer — do not offer suggestions, praise, tips, or requests to try again
+          - If the answer is incorrect, missing, or incomplete, state that directly and factually
+          - Do not ask the candidate to answer the question again while giving feedback
+          - If no answer was given, indicate that clearly and professionally
+          - Example (if no answer): "You did not provide a response to the question. This may reflect a gap in your understanding of the topic."
+          - Example: (normal): "Your explanation covered X well. You might clarify Y."
 
         2. TRANSITION (STRICT RULES):
           - Use one of these openings:
@@ -207,7 +223,7 @@ export const generateQuestions = async (req, res) => {
       if (!question) {
         responseData = feedback + " " + transitionData;
       } else {
-        responseData = feedback + " " + transitionData + " " + question;
+        responseData = feedback + " " + transitionData + " " + question.question;
       }
 
       return res.status(200).json({ message: "Question generated!", question, responseData, finishInterview });
@@ -237,40 +253,43 @@ export const checkRoleAndTopic = async (req, res) => {
 
   try {
     const prompt = `
-  You are an expert AI interview assistant.
+You are an expert AI interview assistant.
 
-  Your task:
-  - Validate whether the given role and topic are appropriate and related.
-  - If valid, generate an array of unique, concise, and orally answerable interview questions relevant to the role and topic.
+Your task:
+- Validate whether the given role and topic are appropriate and related.
+- If valid, generate an array of unique, concise, and orally answerable interview questions relevant to the role and topic.
 
-  Constraints:
-  1. Generate exactly ${numOfQns} unique and non-repetitive interview questions.
-  2. Each question must be clear, focused, and easily answerable within a 30–60 second spoken response.
-  3. All questions must be different in wording and focus — avoid redundancy.
-  4. Avoid overly technical or essay-style questions unless essential to the role.
-  5. Return your response strictly in the following JSON format:
+Constraints:
+1. Generate exactly ${numOfQns} unique and non-repetitive interview questions.
+2. Each question must be clear, focused, and easily answerable within a 30–60 second spoken response.
+3. All questions must be different in wording and focus — avoid redundancy.
+4. Avoid overly technical or essay-style questions unless essential to the role.
+5. For each question, estimate the expected time (in seconds) a candidate would take to answer it orally. The time should be between 30 and 60 seconds and should be appropriate for the question’s complexity and depth.
 
-  If valid:
-  {
-    "valid": true,
-    "questions": [
-      "First unique question?",
-      "Second unique question?",
-      ...
-    ]
-  }
+Return your response strictly in the following JSON format:
 
-  If invalid (role and topic do not match or are inappropriate):
-  {
-    "valid": false,
-    "questions": []
-  }
+If valid:
+{
+  "valid": true,
+  "questions": [
+    { "question": "First unique question?", "time": 30 },
+    { "question": "Second unique question?", "time": 50 }
+    // ...${numOfQns} total
+  ]
+}
 
-  Now process this input:
-  Role: ${role}
-  Topic: ${topic}
+If invalid (role and topic do not match or are inappropriate):
+{
+  "valid": false,
+  "questions": []
+}
 
-  Only respond with the JSON object as described above. Do not include any explanations.`;
+Now process this input:
+Role: ${role}
+Topic: ${topic}
+
+Only respond with the JSON object as described above. Do not include any explanations.`;
+
 
     const aiResponse = await axios.post(
       "http://localhost:11434/api/generate",
