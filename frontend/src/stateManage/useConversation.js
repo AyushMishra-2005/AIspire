@@ -25,6 +25,12 @@ const useConversation = create((set) => ({
 
   quizData : [],
   setQuizData : (quizData) => set({quizData}),
+
+  interviewModelId : '',
+  setInterviewModelId: (interviewModelId) => set({interviewModelId}),
+
+  reportData: [],
+  setReportData: (data) => set({ reportData: data }),
 }));
 
 export default useConversation;

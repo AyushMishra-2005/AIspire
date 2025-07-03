@@ -1,77 +1,95 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './interviewPage.css';
 import { PlaceholdersAndVanishInput } from "../components/ui/placeholders-and-vanish-input.jsx";
 import Avatar from '@mui/material/Avatar';
-
-const interviews = [
-  {
-    logo: "https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg",
-    company: "WhatsApp",
-    role: "Frontend Developer",
-    topics: ["React", "Tailwind CSS"],
-    duration: "30 min"
-  },
-  {
-    logo: "https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png",
-    company: "Facebook",
-    role: "Software Engineer",
-    topics: ["React", "Node.js"],
-    duration: "45 min"
-  },
-  {
-    logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/Logo_minimalista_de_Twitter.png",
-    company: "Twitter",
-    role: "Backend Developer",
-    topics: ["Node.js", "Express"],
-    duration: "30 min"
-  },
-  {
-    logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Googleplex-Logo.svg",
-    company: "Google",
-    role: "Full Stack Engineer",
-    topics: ["React", "Node.js", "MongoDB"],
-    duration: "60 min"
-  },
-  {
-    logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/Logo_minimalista_de_Twitter.png",
-    company: "Twitter",
-    role: "Backend Developer",
-    topics: ["Node.js", "Express"],
-    duration: "30 min"
-  },
-  {
-    logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Googleplex-Logo.svg",
-    company: "Google",
-    role: "Full Stack Engineer",
-    topics: ["React", "Node.js", "MongoDB"],
-    duration: "60 min"
-  },
-];
+import toast from 'react-hot-toast'
+import axios from 'axios'
+import server from '../environment.js'
+import useConversation from '../stateManage/useConversation.js';
+import { useNavigate } from 'react-router-dom'
 
 function AttendInterviews() {
   const placeholders = [
-    "What's the first rule of Fight Club?",
-    "Who is Tyler Durden?",
-    "Where is Andrew Laeddis hiding?",
-    "Write a JavaScript method to reverse a string",
-    "How to assemble your own PC?",
+    "WhatsApp",
+    "Google",
+    "Microsoft",
+    "Amazon",
+    "TCS"
   ];
 
+  const [search, setSearch] = useState("");
+  const [interviews, setInterviews] = useState([]);
+  const { setInterviewData, setInterviewModelId } = useConversation();
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
-    // console.log(e.target.value);
+    setSearch(e.target.value);
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log("submitted");
+    if (!search) {
+      return toast.error("Please enter valid search!");
+    }
+
+    const username = search;
+
+    try {
+      const { data } = await axios.post(
+        `${server}/interview/search-Interviews`,
+        { username },
+        { withCredentials: true }
+      );
+
+      if (data?.interviews) {
+        if (data.interviews.length === 0) {
+          toast.error("No Interview Found");
+        }
+        setInterviews(data.interviews);
+      }
+
+    } catch (err) {
+      console.log(err);
+    }
+
+  };
+
+  const handleAttendClick = async (topics, role, numOfQns, interviewId) => {
+    try {
+      const { data } = await axios.post(
+        `${server}/interview/generateInterviewQuestions`,
+        { topic: topics, role, numOfQns, interviewId },
+        { withCredentials: true }
+      );
+
+      if (data?.interviewData) {
+        console.log(data.interviewData);
+        setInterviewData({
+          topic: topics,
+          role,
+          numOfQns,
+        });
+        setInterviewModelId(data.interviewData._id);
+        navigate('/interviewPage');
+      }
+
+    } catch (err) {
+      console.log(err);
+      const errorMessage = err.response?.data?.message || "Something went wrong!";
+      toast.error(errorMessage);
+    }
+
+
+
   };
 
   return (
     <div className='dark-mystic-bg w-full min-h-screen flex flex-col items-center relative z-10'>
       <div className='flex flex-col w-full max-w-3xl px-6 mt-[4rem]'>
-        <h2 className="mb-6 sm:mb-10 text-2xl sm:text-5xl font-bold text-white text-center">
-          Ask Aceternity UI Anything
+        <h2 className="text-2xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-300 text-center mb-5">
+          Meet Your AI Interview Coach
         </h2>
+
         <PlaceholdersAndVanishInput
           placeholders={placeholders}
           onChange={handleChange}
@@ -90,14 +108,14 @@ function AttendInterviews() {
               <div>
                 <div className="flex justify-center mb-4">
                   <div className="h-[4rem] w-[4rem] rounded-full overflow-hidden border-2 border-[#4c5d6f] shadow-sm flex justify-center items-center">
-                    <Avatar alt="Remy Sharp" src={`https://ui-avatars.com/api/?name=${interview.company}&background=random&color=fff&size=128`} sx={{ width: '4rem', height: '4rem' }} />
+                    <Avatar alt="Remy Sharp" src={`${interview.userId.profilePicURL}` || `https://ui-avatars.com/api/?name=${interview.userId.username}&background=random&color=fff&size=128`} sx={{ width: '4rem', height: '4rem' }} />
                   </div>
                 </div>
-                <h4 className="text-xl font-bold text-center">{interview.company}</h4>
-                <p className="text-sm text-center text-zinc-300 mb-3">{interview.role}</p>
+                <h4 className="text-xl font-bold text-center">{interview.userId.username}</h4>
+                <p className="text-sm text-center text-zinc-300 mb-3">{interview.interview.role}</p>
 
                 <div className="flex flex-wrap justify-center gap-2 my-2">
-                  {interview.topics.map((topic, i) => (
+                  {interview.interview.topics.map((topic, i) => (
                     <span
                       key={i}
                       className="bg-[#3a4a5a] text-xs px-3 py-1 rounded-full text-zinc-200"
@@ -108,14 +126,17 @@ function AttendInterviews() {
                 </div>
 
                 <p className="text-center mt-3 text-zinc-400 text-sm">
-                  Duration: <span className="text-white font-medium">{interview.duration}</span>
+                  Number of Qns: <span className="text-white font-medium">{interview.interview.numOfQns}</span>
                 </p>
               </div>
 
               <div className="mt-6">
                 <button
                   className="w-full bg-[#456179] hover:bg-[#6ca9f3] transition duration-300 text-white font-medium text-sm py-2 px-4 rounded-full shadow hover:shadow-lg cursor-pointer"
-                  onClick={() => alert(`Attending interview at ${interview.company}`)}
+                  onClick={() => {
+                    const interviewId = interview._id;
+                    handleAttendClick(interview.interview.topics.join(', '), interview.interview.role, interview.interview.numOfQns, interviewId);
+                  }}
                 >
                   Attend
                 </button>

@@ -25,12 +25,14 @@ import { ResumesProvider } from './context/getAllResume';
 import AttendInterviews from './companyInterview/attendInterviewsPage';
 import { AiInterviewLandingPage } from './companyInterview/aiInterviewLandingPage';
 import CreateInterviewPage from './companyInterview/createInterviewPage';
-import {AttandantPage} from './companyInterview/attandantPage';
+import { AttandantPage } from './companyInterview/attandantPage';
+import { InterviewsProvider } from './context/getAllInterviews';
+import InterviewFeedback from './components/interviewFeedback';
 
 function App() {
 
   const { authUser, setAuthUser } = useAuth();
-  const { accessInterviewPage } = useConversation();
+  const { interviewModelId } = useConversation();
   const { resumeData } = useResumeStore();
 
   useEffect(() => {
@@ -48,7 +50,7 @@ function App() {
     checkSession();
   }, []);
 
-  
+
 
   return (
     <>
@@ -69,7 +71,17 @@ function App() {
         <div className='flex flex-col items-center h-[100%] w-[100vw] bg-black'>
           <Routes>
             <Route path='/' element={<HomeComponent />} />
-            <Route path='/interviewPage' element={authUser && accessInterviewPage ? <InterviewPage /> : <HomeComponent />} />
+            <Route
+              path='/interviewPage'
+              element={
+                authUser &&
+                  interviewModelId ? (
+                  <InterviewPage />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
             <Route path='/signup' element={authUser ? <HomeComponent /> : <SignupForm />} />
             <Route path='/login' element={authUser ? <HomeComponent /> : <Login />} />
             <Route path="*" element={
@@ -97,12 +109,21 @@ function App() {
               }
             />
             <Route path='/resume/resumeForm' element={authUser && resumeData?.title ? <ResumeForm /> : <Navigate to="/resume/selectResume" replace />} />
-            <Route path='/aiInterviews' element={authUser? <AiInterviewLandingPage /> : <Navigate to="/" replace />} />
-            <Route path='/aiInterviews/attendInterview' element={authUser? <AttendInterviews /> : <Navigate to="/" replace />} />
+            <Route path='/aiInterviews' element={authUser ? <AiInterviewLandingPage /> : <Navigate to="/" replace />} />
+            <Route path='/aiInterviews/attendInterview' element={authUser ? <AttendInterviews /> : <Navigate to="/" replace />} />
 
-            <Route path='/aiInterviews/createInterview' element={authUser? <CreateInterviewPage /> : <Navigate to="/" replace />} />
-            
-            <Route path='/aiInterviews/createInterview/attandants' element={authUser? <AttandantPage /> : <Navigate to="/" replace />} />
+            <Route
+              path='/aiInterviews/createInterview'
+              element={authUser ? (
+                <InterviewsProvider>
+                  <CreateInterviewPage />
+                </InterviewsProvider>
+              ) : (<Navigate to="/" replace />)}
+            />
+
+            <Route path='/aiInterviews/createInterview/attandants' element={authUser ? <AttandantPage /> : <Navigate to="/" replace />} />
+
+            <Route path='/interview/result' element={authUser ? <InterviewFeedback /> : <Navigate to="/" replace />} />
           </Routes>
         </div>
 

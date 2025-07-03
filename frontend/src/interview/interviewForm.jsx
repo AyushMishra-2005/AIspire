@@ -8,7 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const InterviewSection = () => {
   const navigate = useNavigate();
-  const { setAccessInterviewPage,  setInterviewData} = useConversation();
+  const { setAccessInterviewPage,  setInterviewData, interviewModelId, setInterviewModelId} = useConversation();
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -54,6 +54,8 @@ const InterviewSection = () => {
         setLoading(false);
         return toast.error("Please enter valid Role and Topic!");
       }
+
+      setInterviewModelId(data.interviewModelId);
 
       setInterviewData({
         topic,

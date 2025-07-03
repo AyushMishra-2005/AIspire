@@ -3,11 +3,14 @@ import { Schema } from "mongoose";
 
 const interviewSchema = new Schema(
   {
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
+    interviewId: {
+      type : mongoose.Schema.Types.ObjectId,
+      ref : 'CompanyInterviewData'
+    },
+    participant: {
+      type : mongoose.Schema.Types.ObjectId,
+      ref : 'User',
+      required : true
     },
     questions: {
       type: [
@@ -27,7 +30,27 @@ const interviewSchema = new Schema(
     answers: {
       type: [String],
       required: true,
+    },
+
+    reviews : [
+      {
+        review : {
+          type : String,
+        },
+        score : {
+          type : Number
+        }
+      }
+    ],
+
+    totalScore : {
+      type: Number,
+    },
+
+    overAllReview : {
+      type: String,
     }
+
   },
   {
     timestamps: true,

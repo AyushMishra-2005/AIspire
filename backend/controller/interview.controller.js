@@ -2,12 +2,16 @@ import axios from 'axios';
 import InterviewData from '../models/interview.model.js';
 
 export const generateQuestions = async (req, res) => {
-  const { role, topic, name, previousQuestions = [], askedQuestion, numOfQns } = req.body;
-  let {givenAnswer} = req.body;
+  const { role, topic, name, previousQuestions = [], askedQuestion, numOfQns, modelId } = req.body;
+  let { givenAnswer } = req.body;
   const { email } = req.user;
 
   if (!role || !topic || !name) {
     return res.status(500).json({ message: "Must provide a role, topic, and name!" });
+  }
+
+  if (!modelId) {
+    return res.status(500).json({ message: "Must provide a modelId!" });
   }
 
   if (previousQuestions.length > 0 && (!askedQuestion || !givenAnswer)) {
@@ -78,7 +82,7 @@ export const generateQuestions = async (req, res) => {
         return res.status(500).json({ message: "Failed to generate question!" });
       }
 
-      const data = await InterviewData.findOne({ email });
+      const data = await InterviewData.findById(modelId);
       const question = data.questions[0];
 
       let transitionData = transition.trim();
@@ -195,7 +199,7 @@ export const generateQuestions = async (req, res) => {
       response = JSON.parse(jsonMatch[0]);
       const { feedback, transition } = response;
 
-      const data = await InterviewData.findOne({ email });
+      const data = await InterviewData.findById(modelId);
       const question = data.questions[previousQuestions.length];
 
       let transitionData = transition.trim();
@@ -215,7 +219,7 @@ export const generateQuestions = async (req, res) => {
         }
       }
 
-      data.answers.push(givenAnswer);
+      data.answers[previousQuestions.length - 1] = givenAnswer;
       await data.save();
 
       let responseData = "";
@@ -242,6 +246,7 @@ export const checkRoleAndTopic = async (req, res) => {
 
   const { role, topic, numOfQns } = req.body;
   const email = req.user.email;
+  const participant = req.user._id;
 
   if (!role || !topic || !numOfQns) {
     return res.status(500).json({ message: "Provide valid inputs" });
@@ -253,46 +258,46 @@ export const checkRoleAndTopic = async (req, res) => {
 
   try {
     const prompt = `
-You are an expert AI interview assistant.
+    You are an expert AI interview assistant.
 
-Your task:
-- Validate whether the given role and topic are appropriate and related.
-- If valid, generate an array of unique, concise, and orally answerable interview questions relevant to the role and topic.
+    Your task:
+    - Validate whether the given role and topic are appropriate and related.
+    - If valid, generate an array of unique, concise, and orally answerable interview questions relevant to the role and topic.
 
-Constraints:
-1. Generate exactly ${numOfQns} unique and non-repetitive interview questions.
-2. Each question must be clear, focused, and easily answerable within a 30–60 second spoken response.
-3. All questions must be different in wording and focus — avoid redundancy.
-4. Avoid overly technical or essay-style questions unless essential to the role.
-5. For each question, estimate the expected time (in seconds) a candidate would take to answer it orally. Use the following scale:
-    - Simple factual questions: 30–35 seconds.
-    - Conceptual or reasoning-based questions: 40–50 seconds.
-    - Scenario-based, open-ended, or multi-step questions: 50–60 seconds.
-  Ensure a natural variation across the question list, based on complexity.
+    Constraints:
+    1. Generate exactly ${numOfQns} unique and non-repetitive interview questions.
+    2. Each question must be clear, focused, and easily answerable within a 30–60 second spoken response.
+    3. All questions must be different in wording and focus — avoid redundancy.
+    4. Avoid overly technical or essay-style questions unless essential to the role.
+    5. For each question, estimate the expected time (in seconds) a candidate would take to answer it orally. Use the following scale:
+        - Simple factual questions: 30–35 seconds.
+        - Conceptual or reasoning-based questions: 40–50 seconds.
+        - Scenario-based, open-ended, or multi-step questions: 50–60 seconds.
+      Ensure a natural variation across the question list, based on complexity.
 
-Return your response strictly in the following JSON format:
+    Return your response strictly in the following JSON format:
 
-If valid:
-{
-  "valid": true,
-  "questions": [
-    { "question": "First unique question?", "time": 30 },
-    { "question": "Second unique question?", "time": 50 }
-    // ...${numOfQns} total
-  ]
-}
+    If valid:
+    {
+      "valid": true,
+      "questions": [
+        { "question": "First unique question?", "time": 30 },
+        { "question": "Second unique question?", "time": 50 }
+        // ...${numOfQns} total
+      ]
+    }
 
-If invalid (role and topic do not match or are inappropriate):
-{
-  "valid": false,
-  "questions": []
-}
+    If invalid (role and topic do not match or are inappropriate):
+    {
+      "valid": false,
+      "questions": []
+    }
 
-Now process this input:
-Role: ${role}
-Topic: ${topic}
+    Now process this input:
+    Role: ${role}
+    Topic: ${topic}
 
-Only respond with the JSON object as described above. Do not include any explanations.`;
+    Only respond with the JSON object as described above. Do not include any explanations.`;
 
 
     const aiResponse = await axios.post(
@@ -323,6 +328,7 @@ Only respond with the JSON object as described above. Do not include any explana
     let { valid, questions } = response;
 
 
+
     if (valid) {
       try {
 
@@ -330,14 +336,18 @@ Only respond with the JSON object as described above. Do not include any explana
 
         console.log(questions);
 
-        await InterviewData.findOneAndDelete({ email });
-
         const newData = new InterviewData({
           email,
-          questions
+          participant,
+          questions,
+          answers: questions.map(() => "Answer Not Provided.")
         });
 
         await newData.save();
+
+        const interviewModelId = newData._id;
+
+        return res.status(200).json({ message: "Questions generated", response, interviewModelId });
 
       } catch (err) {
         console.log(err);

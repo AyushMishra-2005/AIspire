@@ -10,6 +10,9 @@ import { useAuth } from "../context/AuthProvider.jsx";
 import server from '../environment.js'
 import { useNavigate } from 'react-router-dom'
 import CountdownTimer from "../components/countDownTimer.jsx";
+import InterviewFeedback from "../components/interviewFeedback.jsx";
+import creatingReportAnimation from '../assets/animations/creatingReport.json'
+import Lottie from "lottie-react";
 
 function InterviewPage() {
   const [spokenText, setSpokenText] = useState("");
@@ -19,6 +22,8 @@ function InterviewPage() {
   const [userMic, setUserMic] = useState(false);
   const [aiSpeaking, setAiSpeaking] = useState(false);
   const [finishInterview, setFinishInterview] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportData, setReportData] = useState({});
 
   const scrollRef = useRef(null);
   const { authUser } = useAuth();
@@ -33,7 +38,9 @@ function InterviewPage() {
     setAskedQuestions,
     givenAnswers,
     setGivenAnswers,
-    interviewData
+    interviewData,
+    interviewModelId,
+    setInterviewModelId
   } = useConversation();
   const [startInterview, setStartInterview] = useState(false);
 
@@ -53,9 +60,37 @@ function InterviewPage() {
     controls?.startListening();
   }
 
+  const handleEndInterview = async () => {
+
+    setReportLoading(true);
+
+    try {
+      const { data } = await axios.post(
+        `${server}/interview/evaluateInterviewResult`,
+        { interivewId: interviewModelId },
+        { withCredentials: true }
+      );
+
+      if (data?.interviewData) {
+        console.log(data.interviewData);
+        setReportData(data.interviewData);
+      }
+
+      setReportLoading(false);
+    } catch (err) {
+      console.log(err);
+      setReportLoading(false);
+    }
+
+    setStartInterview(false);
+    setAskedQuestions([]);
+    setAssistantContent("");
+  }
+
+
   useEffect(() => {
-    if(!aiSpeaking && finishInterview){
-      navigate('/');
+    if (!aiSpeaking && finishInterview) {
+      handleEndInterview();
     }
   }, [aiSpeaking, finishInterview]);
 
@@ -74,9 +109,10 @@ function InterviewPage() {
       const previousQuestions = askedQuestions;
       const askedQuestion = assistantContent;
       const givenAnswer = candidateAnswer?.trim() === "" ? "Answer Not Provided." : candidateAnswer;
+      const modelId = interviewModelId;
 
       const { data } = await axios.post(`${server}/interview/generate-question`,
-        { role, topic, name, previousQuestions, askedQuestion, givenAnswer, numOfQns },
+        { role, topic, name, previousQuestions, askedQuestion, givenAnswer, numOfQns, modelId },
         { withCredentials: true }
       );
 
@@ -84,7 +120,7 @@ function InterviewPage() {
       askedQuestions.push(data.question);
       setAskedQuestions(askedQuestions);
 
-      if(data.finishInterview){
+      if (data.finishInterview) {
         setFinishInterview(data.finishInterview);
         setAiSpeaking(true);
       }
@@ -107,10 +143,10 @@ function InterviewPage() {
       const numOfQns = interviewData?.numOfQns;
       const name = authUser.user.name;
       const previousQuestions = askedQuestions;
-      console.log(previousQuestions);
+      const modelId = interviewModelId;
 
       const { data } = await axios.post(`${server}/interview/generate-question`,
-        { role, topic, name, previousQuestions, numOfQns },
+        { role, topic, name, previousQuestions, numOfQns, modelId },
         { withCredentials: true }
       );
       setAssistantContent(data.responseData);
@@ -121,12 +157,21 @@ function InterviewPage() {
     }
   }
 
-  const handleEndInterview = () => {
-    setStartInterview(false);
-    setAskedQuestions([]);
-    setAssistantContent("");
-    navigate("/");
+  if (reportLoading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-80 z-[1000] w-[100vw] h-[100vh] flex flex-col items-center justify-center">
+        <div className="w-64 h-64">
+          <Lottie animationData={creatingReportAnimation} loop={true} />
+        </div>
+        <h2 className="text-white text-2xl mt-6 font-semibold animate-pulse">Generating Interview Report...</h2>
+      </div>
+    );
   }
+
+  if(reportData && Object.keys(reportData).length > 0){
+    return <InterviewFeedback data={reportData}/>;
+  }
+
 
   return (
     <div className="relative flex h-[100vh] w-[100vw] items-center justify-center bg-white dark:bg-gray-950">
@@ -140,11 +185,10 @@ function InterviewPage() {
       />
 
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-gray-950"></div>
-      
+
       {startInterview && userMic && !aiSpeaking && (
         <div className="absolute top-6 right-6 z-50">
-          <CountdownTimer duration={askedQuestions[askedQuestions.length-1]?.time} onComplete={() => {
-            console.log("Time's up");
+          <CountdownTimer duration={5} onComplete={() => {
             handleSendRecording();
           }} />
         </div>
