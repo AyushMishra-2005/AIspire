@@ -172,8 +172,6 @@ export const getAllCandidates = async (req, res) => {
 
   const {interviewId} = req.body;
 
-  console.log("I am working");
-
   if(!interviewId){
     return res.status(501).json({ message: "Missing interviewId" });
   }
