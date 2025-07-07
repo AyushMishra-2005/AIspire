@@ -169,7 +169,7 @@ function InterviewPage() {
   }
 
   if(reportData && Object.keys(reportData).length > 0){
-    return <InterviewFeedback data={reportData}/>;
+    return <InterviewFeedback data={reportData} onBack={() => navigate("/")}/>;
   }
 
 

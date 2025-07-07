@@ -5,6 +5,7 @@ import { ColourfulText } from "../components/ui/colourful-text.jsx";
 import { ImagesSlider } from "../components/ui/images-slider.jsx";
 import ContainerBox from "./containerBox.jsx";
 import { ScrollerComponent } from "./scrollerComponent.jsx";
+import WorkFlow from "./WorkFlow.jsx";
 
 function HomeComponent() {
   const imageRef = useRef(null);
@@ -75,6 +76,8 @@ function HomeComponent() {
           </ImagesSlider>
         </div>
       </div>
+
+      <WorkFlow/>
 
       <div >
         <ContainerBox/>

@@ -245,7 +245,6 @@ export const generateQuestions = async (req, res) => {
 export const checkRoleAndTopic = async (req, res) => {
 
   const { role, topic, numOfQns } = req.body;
-  const email = req.user.email;
   const participant = req.user._id;
 
   if (!role || !topic || !numOfQns) {
@@ -337,7 +336,6 @@ export const checkRoleAndTopic = async (req, res) => {
         console.log(questions);
 
         const newData = new InterviewData({
-          email,
           participant,
           questions,
           answers: questions.map(() => "Answer Not Provided.")

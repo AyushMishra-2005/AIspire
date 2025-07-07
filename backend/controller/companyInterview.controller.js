@@ -123,6 +123,7 @@ export const generateInterviewQuestions = async (req, res) => {
       interviewId,
       participant,
       questions,
+      answers: questions.map(() => "Answer Not Provided.")
     });
 
     await interviewData.save();
@@ -177,7 +178,7 @@ export const getAllCandidates = async (req, res) => {
   }
 
   try{
-
+    
     const candidates = await InterviewData.find({interviewId}).populate("participant", "name email username profilePicURL").populate("interviewId");
 
     return res.status(200).json({candidates});
