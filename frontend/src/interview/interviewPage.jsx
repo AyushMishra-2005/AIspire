@@ -188,7 +188,7 @@ function InterviewPage() {
 
       {startInterview && userMic && !aiSpeaking && (
         <div className="absolute top-6 right-6 z-50">
-          <CountdownTimer duration={5} onComplete={() => {
+          <CountdownTimer duration={askedQuestions[askedQuestions.length-1]?.time} onComplete={() => {
             handleSendRecording();
           }} />
         </div>
