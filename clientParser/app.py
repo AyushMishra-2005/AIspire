@@ -16,7 +16,6 @@ def speak():
         user_text = data.get("text", "Hello, how can I help you?")
         voice = "en-US-JennyNeural"
 
-        # Use Python's tempfile for automatic cleanup
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
             file_path = temp_audio.name
 
