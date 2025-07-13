@@ -34,6 +34,7 @@ export function AttandantPage() {
     username: candidate.participant?.username,
     email: candidate.participant?.email,
     score: candidate.totalScore,
+    fullScore: Array.isArray(candidate.questions) ? candidate.questions.length * 10 : 0,
     src: candidate.participant?.profilePicURL,
     ctaText: "View Result",
     content: candidate.overAllReview || "No summary provided.",
@@ -110,7 +111,7 @@ export function AttandantPage() {
                           {active.email}
                         </motion.p>
                         <p className="text-sm text-gray-500">Username: {active.username}</p>
-                        <p className="text-sm font-semibold text-green-600">Score: {active.score}/100</p>
+                        <p className="text-sm font-semibold text-green-600">Score: {active.score}/{active.fullScore}</p>
                       </div>
 
                       <motion.button
@@ -139,7 +140,7 @@ export function AttandantPage() {
             )}
           </AnimatePresence>
 
-          <ul className="max-w-2xl mx-auto w-full gap-4">
+          <ul className="max-w-2xl mx-auto w-full flex flex-col gap-4">
             {cards.map((card) => (
               <motion.div
                 layoutId={`card-${card.name}-${id}`}
@@ -169,7 +170,7 @@ export function AttandantPage() {
                   >
                     {card.email}
                   </motion.p>
-                  <p className="text-sm font-semibold text-green-600">Score: {card.score}/100</p>
+                  <p className="text-sm font-semibold text-green-600">Score: {card.score}/{card.fullScore}</p>
                 </div>
                 <motion.button
                   layoutId={`button-${card.name}-${id}`}

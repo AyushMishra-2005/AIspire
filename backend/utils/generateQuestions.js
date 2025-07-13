@@ -40,7 +40,7 @@ Only respond with the JSON object as described above. Do not include any explana
     const aiResponse = await axios.post(
       "http://localhost:11434/api/generate",
       {
-        model: "llama3.2",
+        model: "llama3:8b",
         prompt,
         stream: false,
         format: "json",

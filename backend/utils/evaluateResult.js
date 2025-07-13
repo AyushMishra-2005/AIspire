@@ -53,7 +53,7 @@ export async function evaluateResult({ questions, answers }) {
 
   try {
     const response = await axios.post("http://localhost:11434/api/generate", {
-      model: "llama3.2",
+      model: "llama3:8b",
       prompt,
       stream: false,
       format: "json",
