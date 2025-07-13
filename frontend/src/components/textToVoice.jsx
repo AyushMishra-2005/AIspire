@@ -1,65 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import useConversation from "../stateManage/useConversation";
 
-function TextToVoice({onStart, onEnd}) {
-  const [selectedVoice, setSelectedVoice] = useState(null);
-  const { assistantContent, setAssistantContent } = useConversation();
+function TextToVoice({ onStart, onEnd }) {
+  const { assistantContent } = useConversation();
 
-  useEffect(() => {
-    const loadVoices = () => {
-      const allVoices = window.speechSynthesis.getVoices();
-      if (allVoices.length > 0) {
-        const ziraVoice = allVoices.find((v) =>
-          v.name.toLowerCase().includes("zira")
-        );
-        setSelectedVoice(ziraVoice || allVoices[0]);
-      }
-    };
-
-    if (typeof window !== "undefined") {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-      loadVoices();
-    }
-
-    const stopSpeech = () => {
-      window.speechSynthesis.cancel();
-    };
-
-    window.addEventListener("beforeunload", stopSpeech);
-    return () => {
-      stopSpeech();
-      window.removeEventListener("beforeunload", stopSpeech);
-    };
-  }, []);
-
-  const speakText = () => {
+  const speakText = async () => {
     if (!assistantContent.trim()) return;
 
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(assistantContent);
-      if (selectedVoice) utterance.voice = selectedVoice;
-      utterance.pitch = 1.3;
-      utterance.rate = 1.2;
-    
-      utterance.onstart = () => {
-        onStart?.();
-      }
+    try {
+      onStart?.();
 
-      utterance.onend = () => {
+      const response = await fetch("http://localhost:3000/speak", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: assistantContent }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch voice");
+
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
+      const audio = new Audio(audioUrl);
+
+      audio.onended = () => {
         onEnd?.();
-      }
+      };
 
-      window.speechSynthesis.cancel(); 
-      window.speechSynthesis.speak(utterance);
-
-    } else {
-      alert("Sorry, your browser doesn't support text-to-speech.");
+      audio.play();
+    } catch (err) {
+      console.error("Voice playback error:", err.message);
+      onEnd?.();
     }
   };
 
   useEffect(() => {
     speakText();
-  }, [assistantContent, setAssistantContent]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assistantContent]);
 
   return null;
 }
