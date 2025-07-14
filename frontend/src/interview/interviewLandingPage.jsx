@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import mockInterview from "../assets/animations/mockInterview.json"; 
 import { useNavigate } from "react-router-dom";
+import ProfileInterviewForm from "./profileInterviewForm";
 
 export function MockInterviewLandingPage() {
   const navigate = useNavigate();
+
+  const [profileForm, setProfileForm] = useState(false);
+
+  if(profileForm){
+    return(
+      <ProfileInterviewForm/>
+    )
+  }
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white px-6 py-10 flex flex-col md:flex-row items-center justify-center gap-40">
@@ -52,7 +61,7 @@ export function MockInterviewLandingPage() {
             Topic-Driven Mock
           </button>
           <button
-            onClick={() => navigate("/mock/resumeBased")}
+            onClick={() => setProfileForm(true)}
             className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-lg shadow-md transition"
           >
             Profile-Based Mock

@@ -21,7 +21,6 @@ export function NavbarDemo() {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const { authUser } = useAuth();
-  console.log(authUser)
 
   const navItems = [
     { name: "Home", link: "/" },

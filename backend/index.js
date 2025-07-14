@@ -10,21 +10,32 @@ import userRoute from './route/user.route.js'
 import secureRoute from './middleware/secureRoute.js'
 import quizRoute from './route/quiz.route.js'
 import resumeRoute from './route/resume.route.js'
+import profileInterviewRoute from './route/profileInterview.route.js'
 
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const port = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGODB_URI;
 
 
+const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:3000'];
+
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST'],
+  credentials: true
 }));
 
-app.use(express.json({limit : "48kb"}));
+app.use(express.json());
 app.use(cookieParser());
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -46,6 +57,7 @@ app.use('/user', userRoute);
 app.use('/interview', interviewSection);
 app.use('/quiz', quizRoute);
 app.use('/resume', resumeRoute);
+app.use('/profileInterview', profileInterviewRoute);
 
 app.get('/verify-token', secureRoute, (req, res) => {
   res.status(200).json({
@@ -80,6 +92,9 @@ app.post('/deleteImage', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
 
 
 app.listen(port, () => {

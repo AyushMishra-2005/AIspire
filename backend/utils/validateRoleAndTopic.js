@@ -45,8 +45,7 @@ Topics: ${topic}
     return JSON.parse(jsonMatch[0]);
 
   } catch (err) {
-    console.error("validateRoleAndTopic error:", err.message);
-    throw new Error("Validation failed");
+    console.log("validateRoleAndTopic error:", err.message);
   }
 };
 
