@@ -26,11 +26,11 @@ export function NavbarDemo() {
   const navItems = [
     { name: "Home", link: "/" },
     { name: "AI Interviews", link: "/aiInterviews" },
-    { name: "Contact", link: "/" },
+    { name: "Contact", link: "/mockInterviewLandingPage" },
   ];
 
   const features = [
-    { name: "Mock Interview", link: "/interviewForm" },
+    { name: "Mock Interview", link: "/mockInterviewLandingPage" },
     { name: "Quiz", link: "/quiz" },
     { name: "Resume", link: "/resume" },
   ];

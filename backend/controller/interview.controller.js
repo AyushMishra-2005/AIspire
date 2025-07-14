@@ -33,27 +33,27 @@ export const generateQuestions = async (req, res) => {
     if (previousQuestions.length === 0) {
       const prompt = `You are conducting a professional interview for a ${role} position, focusing on ${topic}.
 
-Your task is to generate:
+      Your task is to generate:
 
-1. A warm, professional **welcome message** for the candidate **${name}**, written as **three short parts in a single line** (no line breaks or \\n).
-   - The entire message must be **under 200 words**.
-   - Structure it as three logically separated parts (e.g., greeting + purpose + encouragement), but keep it in one continuous line.
-   - Mention the job title clearly and naturally (e.g., “as a frontend developer” instead of “for this role”).
-   - Use a professional but friendly tone.
-   - Do **not** mention AI, mock interviews, or simulations.
-   - Avoid line breaks, bullet points, and numbered lists.
+      1. A warm, professional **welcome message** for the candidate **${name}**, written as **three short parts in a single line** (no line breaks or \\n).
+        - The entire message must be **under 200 words**.
+        - Structure it as three logically separated parts (e.g., greeting + purpose + encouragement), but keep it in one continuous line.
+        - Mention the job title clearly and naturally (e.g., “as a frontend developer” instead of “for this role”).
+        - Use a professional but friendly tone.
+        - Do **not** mention AI, mock interviews, or simulations.
+        - Avoid line breaks, bullet points, and numbered lists.
 
-2. A **standalone transition phrase** to smoothly begin the first question.
-   - It must be a **phrase or sentence fragment**, not a complete sentence or question.
-   - It must **not** include any background, resume hints, or job-related content.
-   - It must be **professional and slightly varied**, like “Let’s begin with” or “To get things started,”.
-   - It must **not** contain a question mark.
+      2. A **standalone transition phrase** to smoothly begin the first question.
+        - It must be a **phrase or sentence fragment**, not a complete sentence or question.
+        - It must **not** include any background, resume hints, or job-related content.
+        - It must be **professional and slightly varied**, like “Let’s begin with” or “To get things started,”.
+        - It must **not** contain a question mark.
 
-Return STRICT JSON only in this format:
-{
-  "addressing": "single-line welcome message",
-  "transition": "transition phrase"
-}`;
+      Return STRICT JSON only in this format:
+      {
+        "addressing": "single-line welcome message",
+        "transition": "transition phrase"
+      }`;
 
 
 

@@ -28,6 +28,9 @@ import CreateInterviewPage from './companyInterview/createInterviewPage';
 import { AttandantPage } from './companyInterview/attandantPage';
 import { InterviewsProvider } from './context/getAllInterviews';
 import InterviewFeedback from './components/interviewFeedback';
+import { MockInterviewLandingPage } from './interview/interviewLandingPage';
+import Lottie from 'lottie-react';
+import pageNotFound from './assets/animations/errorAnimation.json'
 
 function App() {
 
@@ -86,8 +89,8 @@ function App() {
             <Route path='/login' element={authUser ? <HomeComponent /> : <Login />} />
             <Route path="*" element={
               <>
-                <div className='h-[100vh] w-[100vw] flex justify-center text-center items-center'>
-                  <h3>Page Not Found</h3>
+                <div className="h-[100vh] w-[100vw] flex flex-col justify-center items-center bg-black text-white">
+                  <Lottie animationData={pageNotFound} loop={true} className="w-[400px] h-[400px]" />
                 </div>
               </>
             } />
@@ -124,6 +127,9 @@ function App() {
             <Route path='/aiInterviews/createInterview/attandants' element={authUser ? <AttandantPage /> : <Navigate to="/" replace />} />
 
             <Route path='/interview/result' element={authUser ? <InterviewFeedback /> : <Navigate to="/" replace />} />
+
+            <Route path='/mockInterviewLandingPage' element={authUser ? <MockInterviewLandingPage /> : <Navigate to="/" replace />} />
+
           </Routes>
         </div>
 
