@@ -4,11 +4,13 @@ import fs from 'fs'
 import FormData from 'form-data';
 import { deleteFile } from '../utils/deleteFile.js';
 import { generateInterviewQuestions } from '../utils/generateProfileInterviewQuestions.js';
+import InterviewData from '../models/interview.model.js';
 
 
 export const checkRoleValidity = async (req, res) => {
 
   let { role, topics, numberOfQns } = req.body;
+  const participant = req.user._id;
 
   if (typeof topics === "string") {
     topics = [topics];
@@ -51,9 +53,22 @@ export const checkRoleValidity = async (req, res) => {
       headers: form.getHeaders(),
     });
 
-    console.log("Resume parsed");
 
     if (data.resume_data) {
+    
+      const resume_data = data.resume_data;
+      const job_title = role;
+
+      const response = await axios.post(
+        'http://127.0.0.1:3000/evaluate-resume',
+        {resume_data, job_title, topics}
+      );
+
+      console.log(response.data.evaluation);
+      if(response.data.evaluation.total_score <= 4){
+        return res.status(501).json({message : "Resume doesn't fit for the Role"});
+      }
+
       const questions = await generateInterviewQuestions(
         data.resume_data,
         role,
@@ -63,6 +78,24 @@ export const checkRoleValidity = async (req, res) => {
 
       console.log(questions)
 
+      if(questions){
+        const newData = new InterviewData({
+          participant,
+          questions,
+          answers: questions.map(() => "Answer Not Provided.")
+        });
+
+        await newData.save();
+
+        const interviewModelId = newData._id;
+
+        deleteFile(filePath);
+
+        return res.status(200).json({message : "process successfull", interviewModelId});
+
+      }
+
+      deleteFile(filePath);
       return res.status(200).json({
         resume_data: data.resume_data,
         questions,

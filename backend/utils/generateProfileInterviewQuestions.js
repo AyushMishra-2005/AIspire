@@ -26,19 +26,27 @@ Generate exactly **${numberOfQns}** technical interview questions that follow th
 ---
 
 ### OUTPUT FORMAT:
-Return a valid JSON array like this:
-[
-  { "question": "How did you design your database schema for the inventory system, and what performance issues did you run into?", "time": 48 },
-  { "question": "What was your strategy for debugging and optimizing the authentication module in your mobile app project?", "time": 52 },
-  { "question": "How would you approach load testing for a backend API built with Node.js and Express?", "time": 60 }
-]
+Return a valid JSON object in this exact format:
+
+{
+  "questions": [
+    { "question": "How did you design your database schema for the inventory system, and what performance issues did you run into?", "time": 48 },
+    { "question": "What was your strategy for debugging and optimizing the authentication module in your mobile app project?", "time": 52 },
+    { "question": "How would you approach load testing for a backend API built with Node.js and Express?", "time": 60 }
+  ]
+}
 
 - The "time" must be a **number only** (integer), representing the **estimated number of seconds** it would take to answer the question orally.
 - Do not include the word "seconds" or any extra text.
 - Time should vary based on complexity:
-  - Simpler reflective questions → 45–50 seconds
-  - Multi-part or technical deep-dives → 55–60 seconds
+- Simpler reflective questions → 45–50 seconds
+- Multi-part or technical deep-dives → 55–60 seconds
 
+Important:
+- Always return an object with the key "questions".
+- Even if there is only one question, wrap it in an array.
+- Do not return a plain array or a single object.
+- Do not include explanations, notes, or additional fields.
 ---
 
 ### CANDIDATE RESUME:
@@ -46,9 +54,6 @@ ${JSON.stringify(resumeData)}
 
 Now generate the questions.
 `;
-
-
-
 
   try {
     const response = await axios.post("http://localhost:11434/api/generate", {
@@ -61,14 +66,12 @@ Now generate the questions.
 
     const rawOutput = response.data.response;
 
-    console.log(rawOutput)
+    console.log(rawOutput);
 
     try {
       const parsed = JSON.parse(rawOutput);
 
-      if (Array.isArray(parsed)) {
-        return parsed;
-      } else if (parsed.questions && Array.isArray(parsed.questions)) {
+      if (parsed.questions && Array.isArray(parsed.questions)) {
         return parsed.questions;
       } else {
         console.error("Unexpected LLM format:", parsed);

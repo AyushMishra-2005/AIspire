@@ -62,49 +62,69 @@ def evaluate_resume(resume_json, job_title, topics):
     topics_str = ", ".join(topics)
 
     prompt = f"""
-      You are a strict technical hiring evaluator.
+You are a highly strict and technical hiring evaluator.
 
-      You are given:
-      - A job title
-      - A list of required technologies or topics
-      - A parsed resume in JSON format
+You are provided with:
+- A job title
+- A list of required technologies or topics
+- A parsed resume in structured JSON format
 
-      Your task is to score how well the candidate's resume aligns with the job **only based on those technologies/topics** and the job title.
+Your task is to **rigorously assess** how well the candidate's resume aligns with the job requirements, based **only** on the required topics and job title.
 
-      ### SCORING RULES:
-      - Score out of 10 (no decimals)
-      - Use only relevant experience to calculate score (projects, roles, tools)
-      - Do not give points for unrelated achievements or soft skills
-      - Look for direct mention in projects or experience — skills alone are not enough
-      - Use this guide:
+---
 
-        - 10 = Strong experience/projects **in all listed topics**
-        - 7–9 = Mostly covered with strong depth in some topics
-        - 4–6 = Some coverage, maybe missing hands-on work or key tools
-        - 1–3 = Mentioned skills but no real usage
-        - 0 = No connection to required skills/topics
+### SCORING INSTRUCTIONS (STRICT MODE):
 
-      ### OUTPUT FORMAT:
-      Return only valid JSON in this format:
-      {{
-        "total_score": <integer score out of 10>,
-        "summary_feedback": "<3–4 sentence summary justifying the score based on actual resume content>"
-      }}
+You must assign a score **out of 10**, based **strictly** on the candidate's **hands-on experience** and **project usage** of the listed topics. Ignore unrelated content.
 
-      ### INPUTS:
-      Job Title: "{job_title}"  
-      Required Topics: [{topics_str}]
+  - Award points **only** when:
+  - The topic is **explicitly mentioned** in projects, job roles, or experience **AND**
+  - The candidate demonstrates **actual usage**, implementation, or problem-solving with that topic
 
-      Candidate Resume:
-      {resume_json}
-      """
+  - Do **not** give points for:
+  - Topics listed under "skills" or "technologies" without context
+  - Vague or buzzword mentions without concrete examples
+  - Academic mentions without hands-on application
+  - General-purpose tools (e.g. Python, Java) unless directly applied to a required topic
+
+---
+
+### SCORING SCALE:
+
+- **10**: Strong, hands-on experience in **all** required topics across multiple projects or roles
+- **7–9**: Strong implementation of **most** topics with clear evidence
+- **4–6**: Some exposure or indirect use; lacking technical depth or coverage
+- **1–3**: Topics mentioned but not truly used
+- **0**: No relevant usage of any required topic
+
+---
+
+### OUTPUT FORMAT:
+Return only a valid JSON object like this:
+
+{{
+  "total_score": <integer from 0 to 10>,
+  "summary_feedback": "<3–4 sentence explanation justifying the score. Use specific project/experience references from the resume. Be concise and critical — do not praise irrelevant content.>"
+}}
+
+---
+
+### INPUTS:
+
+Job Title: "{job_title}"  
+Required Topics: [{topics_str}]
+
+Candidate Resume:
+{resume_json}
+"""
+
 
 
     response = requests.post("http://localhost:11434/api/generate", json={
         "model": "llama3:8b",
         "prompt": prompt,
         "stream": False,
-        "temperature": 0.7,
+        "temperature": 0.5,
         "format": "json"
     })
 

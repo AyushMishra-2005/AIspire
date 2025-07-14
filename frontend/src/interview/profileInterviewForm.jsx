@@ -4,12 +4,18 @@ import Lottie from "lottie-react";
 import interviewAnimation from "../assets/animations/profileInterviewAnimation.json";
 import toast from 'react-hot-toast'
 import axios from 'axios'
+import useConversation from '../stateManage/useConversation.js'
+import { useNavigate } from 'react-router-dom';
 
 export default function ProfileInterviewForm() {
   const [topics, setTopics] = useState([""]);
   const [resumeFile, setResumeFile] = useState(null);
   const [role, setRole] = useState("");
   const [numberOfQns, setNumberOfQns] = useState(2);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const { setAccessInterviewPage, setInterviewData, interviewModelId, setInterviewModelId } = useConversation();
 
   const handleTopicChange = (index, value) => {
     const updated = [...topics];
@@ -28,12 +34,12 @@ export default function ProfileInterviewForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!resumeFile || !role.trim() || !numberOfQns || !topics[0].trim()) {
       return toast.error("Fill the form properly.");
     }
 
-    console.log({ resumeFile, role, topics, numberOfQns });
-
+    setLoading(true); 
     const formData = new FormData();
     formData.append('file', resumeFile);
     formData.append('role', role);
@@ -41,25 +47,43 @@ export default function ProfileInterviewForm() {
     topics.forEach(t => formData.append('topics', t));
 
     try {
-
       const { data } = await axios.post(
         'http://localhost:8000/profileInterview/checkRoleValidity',
         formData,
         { withCredentials: true }
       );
 
-      console.log(data.questions);
+      if (data.interviewModelId) {
+        setInterviewModelId(data.interviewModelId);
+      }
+
+      setInterviewData({
+        topic: topics.join(', '),
+        role,
+        numOfQns : numberOfQns
+      });
+
+      setAccessInterviewPage(true);
+      setTopics([""]);
+      setResumeFile(null);
+      setRole("");
+      setNumberOfQns(2);
+      navigate('/interviewPage');
 
     } catch (err) {
       console.log(err);
+      setTopics([""]);
+      setResumeFile(null);
+      setRole("");
+      setNumberOfQns(2);
       const errorMessage =
         err.response?.data?.message || err.message || "Something went wrong";
-
       toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
-
-
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white px-4 py-8 flex items-center justify-center w-full">
@@ -169,9 +193,37 @@ export default function ProfileInterviewForm() {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-sm font-semibold transition"
+              disabled={loading}
+              className={`w-full py-2 rounded text-sm font-semibold transition 
+              ${loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
             >
-              Start Interview
+              {loading ? (
+                <div className="flex justify-center items-center gap-2">
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Processing...
+                </div>
+              ) : (
+                'Start Interview'
+              )}
             </button>
           </div>
         </form>
