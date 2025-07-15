@@ -4,15 +4,23 @@ import Lottie from "lottie-react";
 import mockInterview from "../assets/animations/mockInterview.json"; 
 import { useNavigate } from "react-router-dom";
 import ProfileInterviewForm from "./profileInterviewForm";
+import CheckCameraAndMic from "../components/checkCameraAndMic";
 
 export function MockInterviewLandingPage() {
   const navigate = useNavigate();
 
   const [profileForm, setProfileForm] = useState(false);
+  const [topicForm, setTopicForm] = useState(false);
 
   if(profileForm){
     return(
-      <ProfileInterviewForm/>
+      <CheckCameraAndMic onContinue={() => navigate("/profileInterviewForm")}/>
+    )
+  }
+
+  if(topicForm){
+    return(
+      <CheckCameraAndMic onContinue={() => navigate("/interviewForm")}/>
     )
   }
 
@@ -55,7 +63,7 @@ export function MockInterviewLandingPage() {
           className="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
         >
           <button
-            onClick={() => navigate("/interviewForm")}
+            onClick={() => setTopicForm(true)}
             className="px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-lg shadow-md transition"
           >
             Topic-Driven Mock

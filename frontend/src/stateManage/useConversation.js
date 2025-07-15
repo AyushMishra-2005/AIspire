@@ -31,6 +31,9 @@ const useConversation = create((set) => ({
 
   reportData: [],
   setReportData: (data) => set({ reportData: data }),
+
+  distractionDetect : false,
+  setDistractionDetect: (distractionDetect) => set({distractionDetect}),
 }));
 
 export default useConversation;

@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import useConversation from "../stateManage/useConversation";
 
-function TextToVoice({ onStart, onEnd }) {
+function TextToVoice({ onStart, onEnd, setStopSpeakingCallback }) {
   const { assistantContent } = useConversation();
+  const audioRef = useRef(null);
 
   const speakText = async () => {
     if (!assistantContent.trim()) return;
@@ -21,9 +22,11 @@ function TextToVoice({ onStart, onEnd }) {
       const blob = await response.blob();
       const audioUrl = URL.createObjectURL(blob);
       const audio = new Audio(audioUrl);
+      audioRef.current = audio;
 
       audio.onended = () => {
         onEnd?.();
+        audioRef.current = null;
       };
 
       audio.play();
@@ -34,8 +37,20 @@ function TextToVoice({ onStart, onEnd }) {
   };
 
   useEffect(() => {
+    if (setStopSpeakingCallback) {
+      setStopSpeakingCallback(() => () => {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+          audioRef.current = null;
+          onEnd?.();
+        }
+      });
+    }
+  }, [setStopSpeakingCallback, onEnd]);
+
+  useEffect(() => {
     speakText();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assistantContent]);
 
   return null;

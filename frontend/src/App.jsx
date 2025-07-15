@@ -31,6 +31,7 @@ import InterviewFeedback from './components/interviewFeedback';
 import { MockInterviewLandingPage } from './interview/interviewLandingPage';
 import Lottie from 'lottie-react';
 import pageNotFound from './assets/animations/errorAnimation.json'
+import ProfileInterviewForm from './interview/profileInterviewForm';
 
 function App() {
 
@@ -129,6 +130,8 @@ function App() {
             <Route path='/interview/result' element={authUser ? <InterviewFeedback /> : <Navigate to="/" replace />} />
 
             <Route path='/mockInterviewLandingPage' element={authUser ? <MockInterviewLandingPage /> : <Navigate to="/" replace />} />
+
+            <Route path='/profileInterviewForm' element={authUser ? <ProfileInterviewForm /> : <Navigate to="/mockInterviewLandingPage" replace />} />
 
           </Routes>
         </div>

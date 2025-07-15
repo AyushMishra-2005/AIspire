@@ -24,6 +24,7 @@ function InterviewPage() {
   const [finishInterview, setFinishInterview] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [reportData, setReportData] = useState({});
+  const [stopSpeaking, setStopSpeaking] = useState(() => () => {});
 
   const scrollRef = useRef(null);
   const { authUser } = useAuth();
@@ -40,7 +41,9 @@ function InterviewPage() {
     setGivenAnswers,
     interviewData,
     interviewModelId,
-    setInterviewModelId
+    setInterviewModelId,
+    distractionDetect,
+    setDistractionDetect,
   } = useConversation();
   const [startInterview, setStartInterview] = useState(false);
 
@@ -63,7 +66,8 @@ function InterviewPage() {
   const handleEndInterview = async () => {
 
     setReportLoading(true);
-
+    stopSpeaking();
+    
     try {
       const { data } = await axios.post(
         `${server}/interview/evaluateInterviewResult`,
@@ -86,6 +90,12 @@ function InterviewPage() {
     setAskedQuestions([]);
     setAssistantContent("");
   }
+
+  useEffect(() => {
+    if (distractionDetect) {
+      handleEndInterview();
+    }
+  }, [distractionDetect]);
 
 
   useEffect(() => {
@@ -168,8 +178,8 @@ function InterviewPage() {
     );
   }
 
-  if(reportData && Object.keys(reportData).length > 0){
-    return <InterviewFeedback data={reportData} onBack={() => navigate("/")}/>;
+  if (reportData && Object.keys(reportData).length > 0) {
+    return <InterviewFeedback data={reportData} onBack={() => navigate("/")} />;
   }
 
 
@@ -188,7 +198,7 @@ function InterviewPage() {
 
       {startInterview && userMic && !aiSpeaking && (
         <div className="absolute top-6 right-6 z-50">
-          <CountdownTimer duration={askedQuestions[askedQuestions.length-1]?.time} onComplete={() => {
+          <CountdownTimer duration={askedQuestions[askedQuestions.length - 1]?.time} onComplete={() => {
             handleSendRecording();
           }} />
         </div>
@@ -196,10 +206,11 @@ function InterviewPage() {
       <div className="h-[100%] w-[100%] min-h-[100vh] min-w-[100vw] z-20 flex justify-evenly items-center flex-col">
         <div className="h-[80%] w-[100%] flex flex-row justify-evenly">
           <AssistantPage />
-          <CandidateSection />
+          <CandidateSection startInterview={startInterview} />
           <TextToVoice
             onStart={() => setAiSpeaking(true)}
             onEnd={() => setAiSpeaking(false)}
+            setStopSpeakingCallback={setStopSpeaking}
           />
         </div>
 
