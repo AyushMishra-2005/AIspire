@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaceMesh } from "@mediapipe/face_mesh";
 import * as cam from "@mediapipe/camera_utils";
 import useConversation from "../stateManage/useConversation";
+import { toast } from 'react-hot-toast'
 
 export default function EyeContactDetector() {
   const videoRef = useRef(null);
   const faceMeshRef = useRef(null);
   const lastWarningTimeRef = useRef(Date.now());
   const cameraRef = useRef(null);
-  const {setDistractionDetect} = useConversation();
+  const { setDistractionDetect } = useConversation();
 
   const [isLooking, setIsLooking] = useState(true);
   const [warningCount, setWarningCount] = useState(0);
@@ -127,9 +128,8 @@ export default function EyeContactDetector() {
         {!interviewEnded ? (
           <>
             <div
-              className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium shadow-md ${
-                isLooking ? "bg-green-500" : "bg-red-600"
-              } text-white`}
+              className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium shadow-md ${isLooking ? "bg-green-500" : "bg-red-600"
+                } text-white`}
             >
               {isLooking ? "Looking" : "Not Looking"}
             </div>
