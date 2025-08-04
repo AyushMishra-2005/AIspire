@@ -96,10 +96,6 @@ function HomeComponent() {
         <FeatureGrid />
       </div>
 
-      {/* Feature Highlights */}
-      <div className="mb-10">
-        <FeaturesSection />
-      </div>
     </div>
   );
 }
