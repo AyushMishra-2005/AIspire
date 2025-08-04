@@ -3,9 +3,10 @@ import { motion } from "framer-motion";
 import { BackgroundLines } from "../components/ui/background-lines.jsx";
 import { ColourfulText } from "../components/ui/colourful-text.jsx";
 import { ImagesSlider } from "../components/ui/images-slider.jsx";
-import ContainerBox from "./containerBox.jsx";
 import { ScrollerComponent } from "./scrollerComponent.jsx";
 import WorkFlow from "./WorkFlow.jsx";
+import FeatureGrid from "./FeatureGrid.jsx";
+import FeaturesSection from "./FeaturesSection.jsx";
 
 function HomeComponent() {
   const imageRef = useRef(null);
@@ -36,19 +37,22 @@ function HomeComponent() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-start w-full min-h-[200vh] bg-black">
-      <div className="h-[70vh] flex flex-col justify-center items-center text-white px-4">
+    <div className="flex flex-col items-center justify-start w-full min-h-[200vh] bg-black text-white overflow-x-hidden">
+
+      {/* Hero Section */}
+      <div className="h-[70vh] flex flex-col justify-center items-center px-4">
         <BackgroundLines className="flex items-center justify-center w-full flex-col gap-6">
           <h1 className="text-2xl md:text-5xl lg:text-7xl font-bold text-center relative z-20 font-sans">
-            The smartest <ColourfulText text="AI interview experience" /> <br /> built just for you
+            Welcome to <ColourfulText text="Prepverse.AI" /> <br /> Your AI-powered career universe
           </h1>
           <p className="max-w-xl mx-auto text-sm md:text-lg text-neutral-400 text-center">
-            Get expert guidance through AI-driven interviews and smart resume creation.
-            Practice, improve, and build your career with intelligent support.
+            Step into the multiverse of preparation — AI-powered mock interviews, resume scoring,
+            ATS analysis, and personalized quizzes. Everything tailored just for your career success.
           </p>
         </BackgroundLines>
       </div>
 
+      {/* Image Slider Section */}
       <div className="hero-image-wrapper md:mt-0 w-[100vw] flex justify-center h-[50rem]">
         <div
           ref={imageRef}
@@ -62,7 +66,7 @@ function HomeComponent() {
               className="z-50 flex flex-col justify-center items-center"
             >
               <motion.p className="font-bold text-xl md:text-6xl text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 py-4">
-                AI meets interviews: <br /> Your smartest prep ever
+                Mock. Score. Improve. <br /> Prep like never before with AI.
               </motion.p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -70,23 +74,32 @@ function HomeComponent() {
                 className="px-4 py-2 backdrop-blur-sm border bg-emerald-300/10 border-emerald-500/20 text-white mx-auto text-center rounded-full relative mt-4"
               >
                 <span>Join now →</span>
-                <div className="absolute inset-x-0  h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent via-emerald-500 to-transparent" />
+                <div className="absolute inset-x-0 h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent via-emerald-500 to-transparent" />
               </motion.button>
             </motion.div>
           </ImagesSlider>
         </div>
       </div>
 
-      <WorkFlow/>
-
-      <div >
-        <ContainerBox/>
-      </div>
-
+      {/* WorkFlow Section */}
       <div className="mb-10">
-        <ScrollerComponent/>
+        <WorkFlow />
       </div>
-      
+
+      {/* Scroller Section */}
+      <div className="mb-10">
+        <ScrollerComponent />
+      </div>
+
+      {/* Feature Highlights */}
+      <div className="mb-10">
+        <FeatureGrid />
+      </div>
+
+      {/* Feature Highlights */}
+      <div className="mb-10">
+        <FeaturesSection />
+      </div>
     </div>
   );
 }

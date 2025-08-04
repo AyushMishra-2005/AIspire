@@ -48,7 +48,7 @@ Respond ONLY with the final JSON object.
 
 
   response = requests.post("http://localhost:11434/api/generate", json={
-    "model": "llama3:8b",
+    "model": "llama3.1:8b",
     "prompt": prompt,
     "stream": False,
     "temperature": 0.8,         
@@ -121,7 +121,7 @@ Candidate Resume:
 
 
     response = requests.post("http://localhost:11434/api/generate", json={
-        "model": "llama3:8b",
+        "model": "llama3.1:8b",
         "prompt": prompt,
         "stream": False,
         "temperature": 0.5,

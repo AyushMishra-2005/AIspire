@@ -79,7 +79,6 @@ const QuizInterface = ({ config }) => {
               {questions[current].options.map((opt, idx) => {
                 const label = String.fromCharCode(97 + idx);
                 const isSelected = selected === opt;
-
                 return (
                   <motion.button
                     key={idx}

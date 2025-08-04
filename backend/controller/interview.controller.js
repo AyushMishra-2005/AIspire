@@ -61,7 +61,7 @@ export const generateQuestions = async (req, res) => {
       aiResponse = await axios.post(
         "http://localhost:11434/api/generate",
         {
-          model: "llama3:8b",
+          model: "llama3.1:8b",
           prompt: prompt,
           stream: false,
           format: "json",
@@ -179,7 +179,7 @@ export const generateQuestions = async (req, res) => {
       aiResponse = await axios.post(
         "http://localhost:11434/api/generate",
         {
-          model: "llama3:8b",
+          model: "llama3.1:8b",
           prompt: prompt,
           stream: false,
           format: "json",
@@ -305,7 +305,7 @@ export const checkRoleAndTopic = async (req, res) => {
     const aiResponse = await axios.post(
       "http://localhost:11434/api/generate",
       {
-        model: "llama3:8b",
+        model: "llama3.1:8b",
         prompt: prompt,
         stream: false,
         format: "json",

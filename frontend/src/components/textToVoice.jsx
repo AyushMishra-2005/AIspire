@@ -47,7 +47,7 @@ function TextToVoice({ onStart, onEnd, setStopSpeakingCallback }) {
         }
       });
     }
-  }, [setStopSpeakingCallback, onEnd]);
+  }, [setStopSpeakingCallback]);
 
   useEffect(() => {
     speakText();

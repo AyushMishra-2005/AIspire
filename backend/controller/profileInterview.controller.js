@@ -65,7 +65,7 @@ export const checkRoleValidity = async (req, res) => {
       );
 
       console.log(response.data.evaluation);
-      if(response.data.evaluation.total_score <= 4){
+      if(response.data.evaluation.total_score < 3){
         return res.status(501).json({message : "Resume doesn't fit for the Role"});
       }
 
