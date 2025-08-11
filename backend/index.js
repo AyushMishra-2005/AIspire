@@ -11,9 +11,9 @@ import secureRoute from './middleware/secureRoute.js'
 import quizRoute from './route/quiz.route.js'
 import resumeRoute from './route/resume.route.js'
 import profileInterviewRoute from './route/profileInterview.route.js'
+import {app, io, server} from './SocketIO/server.js'
 
 dotenv.config();
-const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -21,7 +21,7 @@ const port = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGODB_URI;
 
 
-const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:3000'];
+const allowedOrigins = ['http://localhost:5173', 'https://prepverse-ai-python-server.onrender.com', 'https://prepverse-ai.onrender.com', 'http://127.0.0.1:3000'];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -31,7 +31,7 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
 
@@ -97,7 +97,7 @@ app.post('/deleteImage', async (req, res) => {
 
 
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log("app is running at port 8000");
 });
 
