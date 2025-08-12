@@ -63,7 +63,7 @@ export function NavbarDemo() {
               onClose={handleMenuClose}
               PaperProps={{
                 sx: {
-                  backgroundColor: "#1f2937", // gray-800
+                  backgroundColor: "#1f2937", 
                   color: "white",
                   mt: 1,
                   zIndex: 1400,

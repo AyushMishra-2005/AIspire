@@ -39,7 +39,6 @@ function HomeComponent() {
   return (
     <div className="flex flex-col items-center justify-start w-full min-h-[200vh] bg-black text-white overflow-x-hidden">
 
-      {/* Hero Section */}
       <div className="h-[70vh] flex flex-col justify-center items-center px-4">
         <BackgroundLines className="flex items-center justify-center w-full flex-col gap-6">
           <h1 className="text-2xl md:text-5xl lg:text-7xl font-bold text-center relative z-20 font-sans">
@@ -52,7 +51,6 @@ function HomeComponent() {
         </BackgroundLines>
       </div>
 
-      {/* Image Slider Section */}
       <div className="hero-image-wrapper md:mt-0 w-[100vw] flex justify-center h-[50rem]">
         <div
           ref={imageRef}
@@ -81,17 +79,14 @@ function HomeComponent() {
         </div>
       </div>
 
-      {/* WorkFlow Section */}
       <div className="mb-10">
         <WorkFlow />
       </div>
 
-      {/* Scroller Section */}
       <div className="mb-10">
         <ScrollerComponent />
       </div>
 
-      {/* Feature Highlights */}
       <div className="mb-10">
         <FeatureGrid />
       </div>

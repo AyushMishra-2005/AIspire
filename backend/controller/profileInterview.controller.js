@@ -5,6 +5,7 @@ import FormData from 'form-data';
 import { deleteFile } from '../utils/deleteFile.js';
 import { generateInterviewQuestions } from '../utils/generateProfileInterviewQuestions.js';
 import InterviewData from '../models/interview.model.js';
+import {io, getUserSocketId} from '../SocketIO/server.js'
 
 
 export const checkRoleValidity = async (req, res) => {
@@ -36,10 +37,15 @@ export const checkRoleValidity = async (req, res) => {
   const form = new FormData();
   form.append("file", fs.createReadStream(filePath), req.file.originalname);
 
+  const userSocketId = getUserSocketId(participant);
+  if(!userSocketId){
+    return res.status(400).json({message: "User Socket ID not found!"});
+  }
+
   try {
 
     const { valid } = await validateRoleAndTopic({ role, topics });
-
+    io.to(userSocketId).emit("validateRoleAndTopic", {valid});
     console.log(valid);
 
     if (!valid) {
@@ -52,22 +58,32 @@ export const checkRoleValidity = async (req, res) => {
     const { data } = await axios.post(flaskUrl, form, {
       headers: form.getHeaders(),
     });
-
-
-    if (data.resume_data) {
     
+    if (data.resume_data) {
+
+      io.to(userSocketId).emit("resumeParsed");
+
       const resume_data = data.resume_data;
       const job_title = role;
+
+      console.log(resume_data);
 
       const response = await axios.post(
         'http://127.0.0.1:3000/evaluate-resume',
         {resume_data, job_title, topics}
       );
 
-      console.log(response.data.evaluation);
-      if(response.data.evaluation.total_score < 3){
+      const totalScore = response.data.evaluation.total_score;
+      const summaryFeedback = response.data.evaluation.summary_feedback;
+
+      console.log({summaryFeedback, totalScore});
+
+      if(response.data.evaluation.total_score < 30){
+        io.to(userSocketId).emit("resumeScore", {totalScore, summaryFeedback});
         return res.status(501).json({message : "Resume doesn't fit for the Role"});
       }
+
+      io.to(userSocketId).emit("resumeScore", {totalScore, summaryFeedback});
 
       const questions = await generateInterviewQuestions(
         data.resume_data,
@@ -90,6 +106,7 @@ export const checkRoleValidity = async (req, res) => {
         const interviewModelId = newData._id;
 
         deleteFile(filePath);
+        io.to(userSocketId).emit("questionsGenerated");
 
         return res.status(200).json({message : "process successfull", interviewModelId});
 

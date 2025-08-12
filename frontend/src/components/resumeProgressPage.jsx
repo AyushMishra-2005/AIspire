@@ -27,29 +27,31 @@ export default function ResumeProcessingPage() {
 
   useEffect(() => {
     if (!socket) return;
-    socket.on("hii", () => {
-      console.log("hii");
+    socket.on("validateRoleAndTopic", ({ valid }) => {
+      setCurrentStep(1);
+    });
+
+    socket.on("resumeParsed", () => {
+      setCurrentStep(2);
+    });
+
+    socket.on("resumeScore", ({ totalScore, summaryFeedback }) => {
+      setResumeAnalysis({
+        atsScore: totalScore,
+        overallReview: summaryFeedback,
+      });
+      setShowAnalysis(true);
+      setCurrentStep(3);
+    });
+
+    socket.on("questionsGenerated", () => {
+      setCurrentStep(4);
     });
 
     return () => {
-      socket.off("hii");
+      socket.off("validateRoleAndTopic");
     };
   }, [socket]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const { currentStep } = useStepCount.getState();
-      if (currentStep < checklistSteps.length - 1) {
-        if (currentStep === 2) {
-          setTimeout(() => setShowAnalysis(true), 500);
-        }
-        setCurrentStep(currentStep + 1);
-      } else {
-        clearInterval(interval);
-      }
-    }, 2000);
-    return () => clearInterval(interval);
-  }, [checklistSteps.length]);
 
 
   return (
@@ -140,7 +142,6 @@ export default function ResumeProcessingPage() {
                       )}
                     </div>
 
-                    {/* Text */}
                     <div>
                       <p className={`text-lg font-medium ${index <= currentStep ? "text-white" : "text-neutral-500"} transition-colors duration-300`}>
                         {step}
@@ -193,7 +194,25 @@ export default function ResumeProcessingPage() {
                   </div>
 
                   <div className="mt-6 flex justify-between text-xs">
-                    <span className="text-emerald-400">Highly Competitive</span>
+                    <span className={
+                      resumeAnalysis.atsScore > 80
+                        ? "text-emerald-400"
+                        : resumeAnalysis.atsScore > 60
+                          ? "text-blue-400"
+                          : resumeAnalysis.atsScore > 40
+                            ? "text-yellow-400"
+                            : "text-red-400"
+                    }>
+                      {
+                        resumeAnalysis.atsScore > 80
+                          ? "Highly Competitive"
+                          : resumeAnalysis.atsScore > 60
+                            ? "Competitive"
+                            : resumeAnalysis.atsScore > 40
+                              ? "Needs Improvement"
+                              : "Weak"
+                      }
+                    </span>
                     <span className="text-neutral-500">Score: {resumeAnalysis.atsScore}/100</span>
                   </div>
                 </motion.div>
@@ -204,12 +223,12 @@ export default function ResumeProcessingPage() {
             <div className="mt-4">
               <div className="flex justify-between text-sm text-neutral-400 mb-1">
                 <span>Progress</span>
-                <span>{Math.round((currentStep + 1) / checklistSteps.length * 100)}%</span>
+                <span>{Math.round((currentStep) / checklistSteps.length * 100)}%</span>
               </div>
               <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${(currentStep + 1) / checklistSteps.length * 100}%` }}
+                  animate={{ width: `${(currentStep) / checklistSteps.length * 100}%` }}
                   transition={{ duration: 0.8, type: "spring" }}
                   className="h-full bg-gradient-to-r from-emerald-400 to-purple-500 rounded-full"
                 />

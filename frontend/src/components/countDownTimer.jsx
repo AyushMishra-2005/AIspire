@@ -1,4 +1,4 @@
-// components/CountdownTimer.jsx
+
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -18,7 +18,7 @@ const CountdownTimer = ({ duration = 30, onComplete }) => {
   const percentage = (timeLeft / duration) * 100;
 
   return (
-    <div className="relative w-24 h-24">
+    <div className="relative w-16 h-16">
       <svg className="transform -rotate-90" viewBox="0 0 100 100">
         <circle
           cx="50" cy="50" r="45"

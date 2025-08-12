@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import axios from 'axios'
 import useConversation from '../stateManage/useConversation.js'
 import { useNavigate } from 'react-router-dom';
+import ResumeProcessingPage from "../components/resumeProgressPage.jsx";
 
 export default function ProfileInterviewForm() {
   const [topics, setTopics] = useState([""]);
@@ -13,6 +14,7 @@ export default function ProfileInterviewForm() {
   const [role, setRole] = useState("");
   const [numberOfQns, setNumberOfQns] = useState(2);
   const [loading, setLoading] = useState(false);
+  const [openStepProgress, setOpenStepProgress] = useState(false);
   const navigate = useNavigate();
 
   const { setAccessInterviewPage, setInterviewData, interviewModelId, setInterviewModelId } = useConversation();
@@ -47,6 +49,7 @@ export default function ProfileInterviewForm() {
     topics.forEach(t => formData.append('topics', t));
 
     try {
+      setOpenStepProgress(true);
       const { data } = await axios.post(
         'http://localhost:8000/profileInterview/checkRoleValidity',
         formData,
@@ -84,6 +87,11 @@ export default function ProfileInterviewForm() {
     }
   };
 
+  if(openStepProgress){
+    return(
+      <ResumeProcessingPage/>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white px-4 py-8 flex items-center justify-center w-full">

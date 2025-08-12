@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useScroll, useMotionValueEvent } from "framer-motion";
 import { cn } from "../../lib/utils.js";
 import { IconMenu2, IconX } from "@tabler/icons-react";
+import { ColourfulText } from "../../components/ui/colourful-text.jsx";
 
 export const Navbar = ({ children, className }) => {
   const ref = useRef(null);
@@ -171,15 +172,9 @@ export const NavbarLogo = () => {
   return (
     <a
       href="#"
-      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
+      className="relative z-20 mr-4 flex items-center space-x-2 rounded-lg px-3 py-1 text-lg font-semibold tracking-tight transition-all duration-300 hover:scale-105 hover:bg-gradient-to-r"
     >
-      <img
-        src="https://assets.aceternity.com/logo-dark.png"
-        alt="logo"
-        width={30}
-        height={30}
-      />
-      <span className="font-medium text-black dark:text-white">AIspire</span>
+      <ColourfulText text="Prepverse.AI" />
     </a>
   );
 };

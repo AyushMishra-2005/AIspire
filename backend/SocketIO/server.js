@@ -23,7 +23,7 @@ const io = new Server(server, {
 
 const users = {};
 
-const getRecieverAndSenderSocketId = (receiverId) => {
+const getUserSocketId = (receiverId) => {
   return users[receiverId];
 }
 
@@ -34,10 +34,6 @@ io.on("connection", (socket) => {
   if (userId) {
     users[userId] = socket.id;
   }
-
-  
-  socket.emit("hii", "Hello from server");
-
 
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
@@ -51,7 +47,7 @@ io.on("connection", (socket) => {
   });
 });
 
-export { app, io, server, getRecieverAndSenderSocketId }
+export { app, io, server, getUserSocketId }
 
 
 

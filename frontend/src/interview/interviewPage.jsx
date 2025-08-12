@@ -184,7 +184,7 @@ function InterviewPage() {
 
 
   return (
-    <div className="relative flex h-[100vh] w-[100vw] items-center justify-center bg-white dark:bg-gray-950">
+    <div className="relative flex h-[100vh] w-[100vw] items-center justify-center bg-white dark:bg-gray-950 mt-6">
       <div
         className={cn(
           "absolute inset-0",
